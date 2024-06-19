@@ -6,11 +6,13 @@ package cmd
 import (
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Method-Security/methodazure/internal/config"
 	"github.com/Method-Security/pkg/signal"
 	"github.com/Method-Security/pkg/writer"
+	"github.com/palantir/pkg/datetime"
 	"github.com/palantir/witchcraft-go-logging/wlog/svclog/svc1log"
 	"github.com/spf13/cobra"
 )
@@ -47,6 +49,8 @@ func NewMethodAzure(version string) *MethodAzure {
 			Quiet:   false,
 			Verbose: false,
 		},
+		OutputConfig: writer.NewOutputConfig(nil, writer.NewFormat(writer.SIGNAL)),
+		OutputSignal: signal.NewSignal(nil, datetime.DateTime(time.Now()), nil, 0, nil),
 	}
 	return &methodAzure
 }
@@ -95,6 +99,18 @@ func (a *MethodAzure) InitRootCommand() {
 			a.OutputConfig = writer.NewOutputConfig(outputFilePointer, format)
 			cmd.SetContext(svc1log.WithLogger(cmd.Context(), config.InitializeLogging(cmd, &a.RootFlags)))
 			return nil
+		},
+		PersistentPostRunE: func(cmd *cobra.Command, _ []string) error {
+			completedAt := datetime.DateTime(time.Now())
+			a.OutputSignal.CompletedAt = &completedAt
+			return writer.Write(
+				a.OutputSignal.Content,
+				a.OutputConfig,
+				a.OutputSignal.StartedAt,
+				a.OutputSignal.CompletedAt,
+				a.OutputSignal.Status,
+				a.OutputSignal.ErrorMessage,
+			)
 		},
 	}
 
