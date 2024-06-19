@@ -133,6 +133,8 @@ func (a *MethodAzure) InitRootCommand() {
 			return nil
 		},
 	}
+
+	a.RootCmd.AddCommand(a.VersionCmd)
 }
 
 // A utility function to validate that the provided output format is one of the supported formats: json, yaml, signal.
