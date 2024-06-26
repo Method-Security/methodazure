@@ -16,7 +16,7 @@
         <link rel="prev" href="resourcegroup.html">
       
       
-        <link rel="next" href="vm.html">
+        <link rel="next" href="subscription.html">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -622,6 +622,48 @@
   
   
     <li class="md-nav__item">
+      <a href="entra.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Entra
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="iam.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    IAM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="nsg.html" class="md-nav__link">
         
   
@@ -746,6 +788,48 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="subscription.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Subscriptions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tenant.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tenants
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -972,6 +1056,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/azure-dev.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Development Tips
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1084,14 +1189,14 @@ Usage:
 <span class="w">  </span>methodazure<span class="w"> </span>storage<span class="w"> </span>enumerate<span class="w"> </span><span class="o">[</span>flags<span class="o">]</span>
 
 Flags:
-<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">   </span><span class="nb">help</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>enumerate
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">                     </span><span class="nb">help</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>enumerate
+<span class="w">  </span>-s,<span class="w"> </span>--subscription-id<span class="w"> </span>string<span class="w">   </span>Azure<span class="w"> </span>subscription<span class="w"> </span>ID
 
 Global<span class="w"> </span>Flags:
-<span class="w">  </span>-o,<span class="w"> </span>--output<span class="w"> </span>string<span class="w">            </span>Output<span class="w"> </span>format<span class="w"> </span><span class="o">(</span>signal,<span class="w"> </span>json,<span class="w"> </span>yaml<span class="o">)</span>.<span class="w"> </span>Default<span class="w"> </span>value<span class="w"> </span>is<span class="w"> </span>signal<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;signal&quot;</span><span class="o">)</span>
-<span class="w">  </span>-f,<span class="w"> </span>--output-file<span class="w"> </span>string<span class="w">       </span>Path<span class="w"> </span>to<span class="w"> </span>output<span class="w"> </span>file.<span class="w"> </span>If<span class="w"> </span>blank,<span class="w"> </span>will<span class="w"> </span>output<span class="w"> </span>to<span class="w"> </span>STDOUT
-<span class="w">  </span>-q,<span class="w"> </span>--quiet<span class="w">                    </span>Suppress<span class="w"> </span>output
-<span class="w">  </span>-s,<span class="w"> </span>--subscription-id<span class="w"> </span>string<span class="w">   </span>Azure<span class="w"> </span>subscription<span class="w"> </span>ID
-<span class="w">  </span>-v,<span class="w"> </span>--verbose<span class="w">                  </span>Verbose<span class="w"> </span>output
+<span class="w">  </span>-o,<span class="w"> </span>--output<span class="w"> </span>string<span class="w">        </span>Output<span class="w"> </span>format<span class="w"> </span><span class="o">(</span>signal,<span class="w"> </span>json,<span class="w"> </span>yaml<span class="o">)</span>.<span class="w"> </span>Default<span class="w"> </span>value<span class="w"> </span>is<span class="w"> </span>signal<span class="w"> </span><span class="o">(</span>default<span class="w"> </span><span class="s2">&quot;signal&quot;</span><span class="o">)</span>
+<span class="w">  </span>-f,<span class="w"> </span>--output-file<span class="w"> </span>string<span class="w">   </span>Path<span class="w"> </span>to<span class="w"> </span>output<span class="w"> </span>file.<span class="w"> </span>If<span class="w"> </span>blank,<span class="w"> </span>will<span class="w"> </span>output<span class="w"> </span>to<span class="w"> </span>STDOUT
+<span class="w">  </span>-q,<span class="w"> </span>--quiet<span class="w">                </span>Suppress<span class="w"> </span>output
+<span class="w">  </span>-v,<span class="w"> </span>--verbose<span class="w">              </span>Verbose<span class="w"> </span>output
 </code></pre></div>
 
 
@@ -1141,13 +1246,13 @@ Global<span class="w"> </span>Flags:
         
         
           
-          <a href="vm.html" class="md-footer__link md-footer__link--next" aria-label="Next: VMs">
+          <a href="subscription.html" class="md-footer__link md-footer__link--next" aria-label="Next: Subscriptions">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                VMs
+                Subscriptions
               </div>
             </div>
             <div class="md-footer__button md-icon">
