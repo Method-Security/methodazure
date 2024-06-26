@@ -7,7 +7,7 @@ import (
 
 // InitNSGCommand initializes the `methodazure nsg` subcommand that deals with enumerating Network Security Groups in the Azure environment.
 func (a *MethodAzure) InitNSGCommand() {
-	a.NSGCmd = &cobra.Command{
+	nsgCmd := &cobra.Command{
 		Use:   "nsg",
 		Short: "Audit and command Network Security Groups",
 		Long:  `Audit and command Network Security Groups`,
@@ -28,6 +28,6 @@ func (a *MethodAzure) InitNSGCommand() {
 		},
 	}
 
-	a.NSGCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.NSGCmd)
+	nsgCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(nsgCmd)
 }

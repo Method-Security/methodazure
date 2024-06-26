@@ -62,3 +62,11 @@ func GetVNetIDFromVNetName(ctx context.Context, cfg config.AzureConfig, resource
 	// Return the VNet ID
 	return *vnet.ID, nil
 }
+
+// GetStringPtrValue safely returns the value of a string pointer or an empty string if it's nil
+func GetStringPtrValue(s *string) string {
+	if s != nil {
+		return *s
+	}
+	return ""
+}

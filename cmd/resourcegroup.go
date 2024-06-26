@@ -8,7 +8,7 @@ import (
 // InitResourceGroupCommand initializes the `methodazure resourcegroup` subcommand that deals with enumerating
 // Resource Groups in the Azure environment.
 func (a *MethodAzure) InitResourceGroupCommand() {
-	a.ResourceGroupCmd = &cobra.Command{
+	resourceGroupCmd := &cobra.Command{
 		Use:   "resourcegroup",
 		Short: "Audit and command Resource Groups",
 		Long:  `Audit and command Resource Groups`,
@@ -29,6 +29,6 @@ func (a *MethodAzure) InitResourceGroupCommand() {
 		},
 	}
 
-	a.ResourceGroupCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.ResourceGroupCmd)
+	resourceGroupCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(resourceGroupCmd)
 }

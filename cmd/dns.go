@@ -7,7 +7,7 @@ import (
 
 // InitDNSCommand initializes the `methodazure dns` subcommand that deals with enumerating DNS related resources in the Azure environment.
 func (a *MethodAzure) InitDNSCommand() {
-	a.DNSCmd = &cobra.Command{
+	dnsCmd := &cobra.Command{
 		Use:   "dns",
 		Short: "Audit and command DNS related resources",
 		Long:  `Audit and command DNS related resourcess`,
@@ -28,6 +28,6 @@ func (a *MethodAzure) InitDNSCommand() {
 		},
 	}
 
-	a.DNSCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.DNSCmd)
+	dnsCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(dnsCmd)
 }

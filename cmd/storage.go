@@ -8,7 +8,7 @@ import (
 // InitStorageAccountCommand initializes the `methodazure storage` subcommand that deals with enumerating Storage
 // Accounts in the Azure environment.
 func (a *MethodAzure) InitStorageAccountCommand() {
-	a.StorageAccountCmd = &cobra.Command{
+	storageAccountCmd := &cobra.Command{
 		Use:   "storage",
 		Short: "Audit and command Storage Accounts",
 		Long:  `Audit and command Storage Accounts`,
@@ -29,6 +29,6 @@ func (a *MethodAzure) InitStorageAccountCommand() {
 		},
 	}
 
-	a.StorageAccountCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.StorageAccountCmd)
+	storageAccountCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(storageAccountCmd)
 }

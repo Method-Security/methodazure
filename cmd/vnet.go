@@ -7,7 +7,7 @@ import (
 
 // InitVNetCommand initializes the `methodazure vnet` subcommand that deals with enumerating VNets in the Azure environment.
 func (a *MethodAzure) InitVNetCommand() {
-	a.VNetCmd = &cobra.Command{
+	vnetCmd := &cobra.Command{
 		Use:   "vnet",
 		Short: "Audit and command VNets",
 		Long:  `Audit and command VNets`,
@@ -28,6 +28,6 @@ func (a *MethodAzure) InitVNetCommand() {
 		},
 	}
 
-	a.VNetCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.VNetCmd)
+	vnetCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(vnetCmd)
 }

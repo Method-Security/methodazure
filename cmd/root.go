@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -29,14 +30,6 @@ type MethodAzure struct {
 	OutputSignal      signal.Signal
 	RootCmd           *cobra.Command
 	VersionCmd        *cobra.Command
-	VMCmd             *cobra.Command
-	StorageAccountCmd *cobra.Command
-	AKSCmd            *cobra.Command
-	DatabaseCmd       *cobra.Command
-	DNSCmd            *cobra.Command
-	VNetCmd           *cobra.Command
-	ResourceGroupCmd  *cobra.Command
-	NSGCmd            *cobra.Command
 }
 
 // NewMethodAzure returns a new MethodAzure struct with the provided version string. The MethodAzure struct is used to
@@ -76,9 +69,18 @@ func (a *MethodAzure) InitRootCommand() {
 				return err
 			}
 			if subscriptionID == "" {
-				return errors.New("flag subscription-id is not set")
+				fmt.Print("Warning - flag subscription-id is not set; several commands require this flag to be set\n")
 			}
 			a.AzureConfig.SubID = subscriptionID
+
+			graphServiceEndpoint, err := cmd.Flags().GetString("graph-service-endpoint")
+			if err != nil {
+				return err
+			}
+			if graphServiceEndpoint == "" {
+				fmt.Print("Warning - flag graph-service-endpoint is not set; several commands require this flag to be set\n")
+			}
+			a.AzureConfig.GraphServiceEndpoint = graphServiceEndpoint
 
 			cred, err := azidentity.NewDefaultAzureCredential(nil)
 			if err != nil {
@@ -117,6 +119,7 @@ func (a *MethodAzure) InitRootCommand() {
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Quiet, "quiet", "q", false, "Suppress output")
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Verbose, "verbose", "v", false, "Verbose output")
 	a.RootCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
+	a.RootCmd.PersistentFlags().StringP("graph-service-endpoint", "g", "https://graph.microsoft.com/.default", "Microsoft Graph Service Endpoint")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFile, "output-file", "f", "", "Path to output file. If blank, will output to STDOUT")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "signal", "Output format (signal, json, yaml). Default value is signal")
 

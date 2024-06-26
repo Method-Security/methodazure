@@ -8,7 +8,7 @@ import (
 // InitDatabaseCommand initializes the `methodazure database` subcommand that deals with enumerating managed Database
 // instances in the Azure environment.
 func (a *MethodAzure) InitDatabaseCommand() {
-	a.DatabaseCmd = &cobra.Command{
+	databaseCmd := &cobra.Command{
 		Use:   "database",
 		Short: "Audit and command managed Database instances",
 		Long:  `Audit and command managed Database instances`,
@@ -29,6 +29,6 @@ func (a *MethodAzure) InitDatabaseCommand() {
 		},
 	}
 
-	a.DatabaseCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.DatabaseCmd)
+	databaseCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(databaseCmd)
 }

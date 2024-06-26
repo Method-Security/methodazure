@@ -7,7 +7,7 @@ import (
 
 // InitAKSCommand initializes the `methodazure aks` subcommand that deals with enumerating AKS clusters in the Azure environment.
 func (a *MethodAzure) InitAKSCommand() {
-	a.AKSCmd = &cobra.Command{
+	aksCmd := &cobra.Command{
 		Use:   "aks",
 		Short: "Audit and command AKS clusters",
 		Long:  `Audit and command AKS clusters`,
@@ -28,6 +28,6 @@ func (a *MethodAzure) InitAKSCommand() {
 		},
 	}
 
-	a.AKSCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.AKSCmd)
+	aksCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(aksCmd)
 }

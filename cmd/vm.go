@@ -8,7 +8,7 @@ import (
 // InitVMCommand initializes the `methodazure vm` subcommand that deals with enumerating Virtual Machines in the
 // Azure environment.
 func (a *MethodAzure) InitVMCommand() {
-	a.VMCmd = &cobra.Command{
+	vmCmd := &cobra.Command{
 		Use:   "vm",
 		Short: "Audit and command Virtual Machines",
 		Long:  `Audit and command Virtual Machines`,
@@ -29,6 +29,6 @@ func (a *MethodAzure) InitVMCommand() {
 		},
 	}
 
-	a.VMCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(a.VMCmd)
+	vmCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(vmCmd)
 }
