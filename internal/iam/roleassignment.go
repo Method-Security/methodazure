@@ -1,0 +1,43 @@
+// Package iam provides functions and data structures to interact with Azure IAM resources.
+package iam
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2"
+	"github.com/Method-Security/methodazure/internal/config"
+)
+
+func listRoleAssignments(ctx context.Context, cfg config.AzureConfig) ([]RoleAssignmentDetails, error) {
+	roleAssignments := []RoleAssignmentDetails{}
+
+	// Create a new client to interact with the Authorization resource provider
+	clientFactory, err := armauthorization.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	if err != nil {
+		return roleAssignments, fmt.Errorf("failed to create client factory: %v", err)
+	}
+
+	// The scope for listing role definitions (in this case, the subscription)
+	scope := fmt.Sprintf("/subscriptions/%s", cfg.SubID)
+
+	// Create a pager to list all role assignments in the subscription
+	pager := clientFactory.NewRoleAssignmentsClient().NewListForScopePager(scope, nil)
+
+	// Loop through the pages and save each role assignment
+	for pager.More() {
+		page, err := pager.NextPage(ctx)
+		if err != nil {
+			return roleAssignments, fmt.Errorf("failed to advance page: %v", err)
+		}
+		for _, ra := range page.Value {
+			roleAssignmentDetails := RoleAssignmentDetails{
+				ID:             *ra.ID,
+				RoleAssignment: *ra,
+			}
+			roleAssignments = append(roleAssignments, roleAssignmentDetails)
+		}
+	}
+
+	return roleAssignments, nil
+}

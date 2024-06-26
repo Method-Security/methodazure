@@ -6,6 +6,8 @@ The `methodazure vm` family of commands are intended to provide support to secur
 
 Provides detailed information about all VMs discovered in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

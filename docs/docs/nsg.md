@@ -6,6 +6,8 @@ The `methodazure nsg` family of commands are intended to provide detailed data r
 
 Provides detailed information about all Network Security Groups discovered in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

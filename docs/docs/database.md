@@ -6,6 +6,8 @@ The `methodazure database` family of commands are intended to provide support to
 
 Provides detailed information about all managed databases discovered in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

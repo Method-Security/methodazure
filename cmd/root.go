@@ -6,6 +6,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -23,13 +24,13 @@ import (
 // for use by subcommands. The output signal is used to write the output of the command to the desired output format
 // after the execution of the invoked commands Run function.
 type MethodAzure struct {
-	Version           string
-	RootFlags         config.RootFlags
-	AzureConfig       config.AzureConfig
-	OutputConfig      writer.OutputConfig
-	OutputSignal      signal.Signal
-	RootCmd           *cobra.Command
-	VersionCmd        *cobra.Command
+	Version      string
+	RootFlags    config.RootFlags
+	AzureConfig  config.AzureConfig
+	OutputConfig writer.OutputConfig
+	OutputSignal signal.Signal
+	RootCmd      *cobra.Command
+	VersionCmd   *cobra.Command
 }
 
 // NewMethodAzure returns a new MethodAzure struct with the provided version string. The MethodAzure struct is used to
@@ -81,6 +82,12 @@ func (a *MethodAzure) InitRootCommand() {
 				fmt.Print("Warning - flag graph-service-endpoint is not set; several commands require this flag to be set\n")
 			}
 			a.AzureConfig.GraphServiceEndpoint = graphServiceEndpoint
+
+			tenantID := os.Getenv("AZURE_TENANT_ID")
+			if tenantID == "" {
+				return errors.New("AZURE_TENANT_ID environment variable is not set")
+			}
+			a.AzureConfig.TenantID = tenantID
 
 			cred, err := azidentity.NewDefaultAzureCredential(nil)
 			if err != nil {

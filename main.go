@@ -23,6 +23,9 @@ func main() {
 	methodazure.InitResourceGroupCommand()
 	methodazure.InitNSGCommand()
 	methodazure.InitEntraCommand()
+	methodazure.InitIAMCommand()
+	methodazure.InitTenantCommand()
+	methodazure.InitSubscriptionCommand()
 
 	if err := methodazure.RootCmd.Execute(); err != nil {
 		os.Exit(1)

@@ -6,6 +6,8 @@ The `methodazure aks` family of commands are intended to provide support to secu
 
 Provides detailed information about all AKS clusters discovered in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

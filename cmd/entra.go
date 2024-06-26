@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-
 	"github.com/Method-Security/methodazure/internal/entra"
+	"github.com/spf13/cobra"
 )
 
-// InitDNSCommand initializes the `methodazure dns` subcommand that deals with enumerating DNS related resources in the Azure environment.
+// InitEntraCommand initializes the `methodazure entra` subcommand that deals with enumerating Entra related resources in the Azure environment.
 func (a *MethodAzure) InitEntraCommand() {
 	entraCmd := &cobra.Command{
 		Use:   "entra",
@@ -16,8 +15,8 @@ func (a *MethodAzure) InitEntraCommand() {
 
 	enumerateCmd := &cobra.Command{
 		Use:   "enumerate",
-		Short: "Enumerate Entra ID users, groups, rols, and role assignments",
-		Long:  `Enumerate Entra ID users, groups, rols, and role assignments`,
+		Short: "Enumerate Entra ID users, groups, and service principals in a given Tenant",
+		Long:  `Enumerate Entra ID users, groups, and service principals in a given Tenant`,
 		Run: func(cmd *cobra.Command, args []string) {
 			report, err := entra.EnumerateEntra(cmd.Context(), a.AzureConfig)
 			if err != nil {

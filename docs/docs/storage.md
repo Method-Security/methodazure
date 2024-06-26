@@ -6,6 +6,8 @@ The `methodazure storage` family of commands provide visibility into Azure Stora
 
 Provides detailed information about all storage accounts discovered in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

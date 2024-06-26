@@ -6,6 +6,8 @@ The `methodazure dns` family of commands are intended to provide insights and vi
 
 Provides detailed information about Azure's managed DNS resources in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

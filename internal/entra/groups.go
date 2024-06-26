@@ -6,19 +6,20 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Method-Security/methodazure/internal/azure"
 	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 	"github.com/microsoftgraph/msgraph-sdk-go/groups"
 	"github.com/microsoftgraph/msgraph-sdk-go/models"
-	"github.com/microsoftgraph/msgraph-sdk-go/users"
 )
 
 func listGroups(ctx context.Context, client *msgraphsdk.GraphServiceClient) ([]GroupDetails, error) {
-	var groupDetails []GroupDetails
+	groupsDetailsList := []GroupDetails{}
 
 	// Set up query parameters for groups
 	queryParams := &groups.GroupsRequestBuilderGetQueryParameters{
-		Select: []string{"id", "displayName"},
+		Select: []string{"id", "displayName", "description", "createdDateTime", "members"},
+		Expand: []string{"members($select=id)"},
+		Top:    new(int32),
 	}
 	*queryParams.Top = 50 // Controls pagination size
 
@@ -36,12 +37,23 @@ func listGroups(ctx context.Context, client *msgraphsdk.GraphServiceClient) ([]G
 	for {
 		if result.GetValue() != nil {
 			for _, group := range result.GetValue() {
-				fmt.Printf("Group ID: %s, Display Name: %s\n", *group.GetId(), *group.GetDisplayName())
-				
+				groupDetails := GroupDetails{
+					ID:              azure.GetStringPtrValue(group.GetId()),
+					DisplayName:     azure.GetStringPtrValue(group.GetDisplayName()),
+					Description:     azure.GetStringPtrValue(group.GetDescription()),
+					CreatedDateTime: *group.GetCreatedDateTime(),
+				}
+
 				// Get members for this group
-				getGroupMembers(graphClient, *group.GetId())
-				
-				fmt.Println() // Add a blank line between groups
+				members, err := getGroupMembers(group)
+				if err != nil {
+					fmt.Println("Failed to get members for group", *group.GetId(), ":", err)
+				} else {
+					groupDetails.Members = members
+				}
+
+				groupsDetailsList = append(groupsDetailsList, groupDetails)
+
 			}
 		}
 
@@ -51,53 +63,39 @@ func listGroups(ctx context.Context, client *msgraphsdk.GraphServiceClient) ([]G
 		}
 
 		// Create a new request for the next page
-		nextReq := groups.NewGroupsRequestBuilder(*nextLink, graphClient.GetAdapter())
+		nextReq := groups.NewGroupsRequestBuilder(*nextLink, client.GetAdapter())
 		result, err = nextReq.Get(ctx, nil)
 		if err != nil {
 			log.Fatalf("Failed to get next page of groups: %v", err)
 		}
 	}
+
+	return groupsDetailsList, nil
 }
 
-func getGroupMembers(graphClient *msgraphsdk.GraphServiceClient, groupID string) {
-	ctx := context.Background()
+func getGroupMembers(group models.Groupable) ([]GroupMember, error) {
+	groupMembers := []GroupMember{}
 
-	// Set up query parameters for group members
-	queryParams := &groups.ItemMembersRequestBuilderGetQueryParameters{
-		Select: []string{"id"},
+	members := group.GetMembers()
+	if members == nil {
+		return nil, fmt.Errorf("group %s has no members", *group.GetId())
 	}
 
-	// Set up request configuration for group members
-	requestConfig := &groups.ItemMembersRequestBuilderGetRequestConfiguration{
-		QueryParameters: queryParams,
-	}
-
-	// Get the first page of results
-	result, err := graphClient.GroupsById(groupID).Members().Get(ctx, requestConfig)
-	if err != nil {
-		log.Printf("Failed to get members for group %s: %v", groupID, err)
-		return
-	}
-
-	fmt.Println("  Members:")
-	for {
-		if result.GetValue() != nil {
-			for _, member := range result.GetValue() {
-				fmt.Printf("    Member ID: %s\n", *member.GetId())
-			}
+	for _, member := range members {
+		// Check if the member object is not nil
+		if member == nil {
+			continue
 		}
 
-		nextLink := result.GetOdataNextLink()
-		if nextLink == nil {
-			break
-		}
-
-		// Create a new request for the next page
-		nextReq := groups.NewItemMembersRequestBuilder(*nextLink, graphClient.GetAdapter())
-		result, err = nextReq.Get(ctx, nil)
-		if err != nil {
-			log.Printf("Failed to get next page of members for group %s: %v", groupID, err)
-			return
+		id := member.GetId()
+		if id == nil {
+			continue
+		} else {
+			groupMembers = append(groupMembers, GroupMember{
+				ID: *id,
+			})
 		}
 	}
+
+	return groupMembers, nil
 }

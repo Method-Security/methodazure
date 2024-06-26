@@ -56,7 +56,7 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 	// Create a pager to list all AKS clusters in the subscription
 	pager := clientFactory.NewManagedClustersClient().NewListPager(nil)
 
-	// Loop through the pages and print the AKS cluster names
+	// Loop through the pages and get AKS clusters
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {

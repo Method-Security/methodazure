@@ -6,6 +6,8 @@ The `methodazure vnet` family of commands are intended to provide visibility and
 
 Provides detailed information about all VNets discovered in the given subscription.
 
+This command requires a Subscription ID and is scoped only to a single subscription.
+
 ### Usage
 
 ```bash

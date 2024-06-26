@@ -5,10 +5,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Method-Security/methodazure/internal/azure"
 	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 	"github.com/microsoftgraph/msgraph-sdk-go/users"
-
-	"github.com/Method-Security/methodazure/internal/azure"
 )
 
 func listUsers(ctx context.Context, client *msgraphsdk.GraphServiceClient) ([]UserDetails, error) {
@@ -26,34 +25,13 @@ func listUsers(ctx context.Context, client *msgraphsdk.GraphServiceClient) ([]Us
 		QueryParameters: queryParams,
 	}
 
-	// Create a pager to list all users
+	// Get the first page of results
 	result, err := client.Users().Get(ctx, requestConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get users: %v", err)
 	}
 
-	// Process and print user details, goes through first pagination page
-	if result.GetValue() != nil {
-		for _, user := range result.GetValue() {
-			userDetails = append(userDetails, UserDetails{
-				ID:                azure.GetStringPtrValue(user.GetId()),
-				DisplayName:       azure.GetStringPtrValue(user.GetDisplayName()),
-				UserPrincipalName: azure.GetStringPtrValue(user.GetUserPrincipalName()),
-				Mail:              azure.GetStringPtrValue(user.GetMail()),
-			})
-		}
-	}
-
-	// Handle pagination if there are more results
-	nextLink := result.GetOdataNextLink()
-	for nextLink != nil {
-		// Create a new request for the next page
-		nextReq := users.NewUsersRequestBuilder(*nextLink, client.GetAdapter())
-		result, err = nextReq.Get(context.Background(), nil)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get the next page of users: %v", err)
-		}
-
+	for {
 		if result.GetValue() != nil {
 			for _, user := range result.GetValue() {
 				userDetails = append(userDetails, UserDetails{
@@ -65,7 +43,17 @@ func listUsers(ctx context.Context, client *msgraphsdk.GraphServiceClient) ([]Us
 			}
 		}
 
-		nextLink = result.GetOdataNextLink()
+		nextLink := result.GetOdataNextLink()
+		if nextLink == nil {
+			break
+		}
+
+		// Create a new request for the next page
+		nextReq := users.NewUsersRequestBuilder(*nextLink, client.GetAdapter())
+		result, err = nextReq.Get(ctx, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get the next page of users: %v", err)
+		}
 	}
 
 	return userDetails, nil
