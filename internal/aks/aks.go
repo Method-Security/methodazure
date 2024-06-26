@@ -15,28 +15,28 @@ import (
 
 // NodePoolDetails contains details about a single AKS node pool and the VMs in the pool.
 type NodePoolDetails struct {
-	Details armcontainerservice.AgentPool `json:"details"`
-	VMIDs   []string                      `json:"vm_ids"`
+	Details armcontainerservice.AgentPool `json:"details" yaml:"details"`
+	VMIDs   []string                      `json:"vm_ids" yaml:"vm_ids"`
 }
 
 // ClusterDetails contains details about a single AKS cluster, including the cluster details and node pools.
 type ClusterDetails struct {
-	Name          string                             `json:"cluster_name"`
-	ResourceGroup string                             `json:"resource_group"`
-	Details       armcontainerservice.ManagedCluster `json:"details"`
-	NodePools     []NodePoolDetails                  `json:"node_pools"`
+	Name          string                             `json:"cluster_name" yaml:"cluster_name"`
+	ResourceGroup string                             `json:"resource_group" yaml:"resource_group"`
+	Details       armcontainerservice.ManagedCluster `json:"details" yaml:"details"`
+	NodePools     []NodePoolDetails                  `json:"node_pools" yaml:"node_pools"`
 }
 
 // AzureResources contains details about all AKS clusters in the subscription.
 type AzureResources struct {
-	SubscriptionID string           `json:"subscription_id"`
-	AKSClusters    []ClusterDetails `json:"aks_clusters"`
+	SubscriptionID string           `json:"subscription_id" yaml:"subscription_id"`
+	AKSClusters    []ClusterDetails `json:"aks_clusters" yaml:"aks_clusters"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources"`
-	Errors    []string       `json:"errors"`
+	Resources AzureResources `json:"resources" yaml:"resources"`
+	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
 // EnumerateAKSClusters enumerates all AKS clusters in the subscription, returning a report of the clusters and any

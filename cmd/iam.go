@@ -18,6 +18,19 @@ func (a *MethodAzure) InitIAMCommand() {
 		Short: "Enumerate IAM related resources in a given subscription",
 		Long:  `Enumerate IAM related resources; retreives roles and role assignments in a given subscription`,
 		Run: func(cmd *cobra.Command, args []string) {
+			subscriptionID, err := cmd.Flags().GetString("subscription-id")
+			if err != nil {
+				errorMessage := err.Error()
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			if subscriptionID == "" {
+				errorMessage := "subscription-id is not set"
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			a.AzureConfig.SubID = subscriptionID
+
 			report, err := iam.EnumerateIAMResources(cmd.Context(), a.AzureConfig)
 			if err != nil {
 				errorMessage := err.Error()
@@ -27,6 +40,7 @@ func (a *MethodAzure) InitIAMCommand() {
 			a.OutputSignal.Content = report
 		},
 	}
+	enumerateCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
 
 	iamCmd.AddCommand(enumerateCmd)
 	a.RootCmd.AddCommand(iamCmd)

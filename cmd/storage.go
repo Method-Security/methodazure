@@ -19,6 +19,19 @@ func (a *MethodAzure) InitStorageAccountCommand() {
 		Short: "Enumerate Storage Accounts",
 		Long:  `Enumerate Storage Accounts`,
 		Run: func(cmd *cobra.Command, args []string) {
+			subscriptionID, err := cmd.Flags().GetString("subscription-id")
+			if err != nil {
+				errorMessage := err.Error()
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			if subscriptionID == "" {
+				errorMessage := "subscription-id is not set"
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			a.AzureConfig.SubID = subscriptionID
+
 			report, err := storage.EnumerateStorageAccounts(cmd.Context(), a.AzureConfig)
 			if err != nil {
 				errorMessage := err.Error()
@@ -28,6 +41,7 @@ func (a *MethodAzure) InitStorageAccountCommand() {
 			a.OutputSignal.Content = report
 		},
 	}
+	enumerateCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
 
 	storageAccountCmd.AddCommand(enumerateCmd)
 	a.RootCmd.AddCommand(storageAccountCmd)

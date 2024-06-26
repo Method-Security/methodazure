@@ -6,8 +6,6 @@ The `methodazure nsg` family of commands are intended to provide detailed data r
 
 Provides detailed information about all Network Security Groups discovered in the given subscription.
 
-This command requires a Subscription ID and is scoped only to a single subscription.
-
 ### Usage
 
 ```bash
@@ -24,13 +22,13 @@ Usage:
   methodazure nsg enumerate [flags]
 
 Flags:
-  -h, --help   help for enumerate
+  -h, --help                     help for enumerate
+  -s, --subscription-id string   Azure subscription ID
 
 Global Flags:
-  -o, --output string            Output format (signal, json, yaml). Default value is signal (default "signal")
-  -f, --output-file string       Path to output file. If blank, will output to STDOUT
-  -q, --quiet                    Suppress output
-  -s, --subscription-id string   Azure subscription ID
-  -v, --verbose                  Verbose output
+  -o, --output string        Output format (signal, json, yaml). Default value is signal (default "signal")
+  -f, --output-file string   Path to output file. If blank, will output to STDOUT
+  -q, --quiet                Suppress output
+  -v, --verbose              Verbose output
 
 ```

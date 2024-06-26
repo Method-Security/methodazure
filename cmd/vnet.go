@@ -18,6 +18,19 @@ func (a *MethodAzure) InitVNetCommand() {
 		Short: "Enumerate VNets",
 		Long:  `Enumerate VNets`,
 		Run: func(cmd *cobra.Command, args []string) {
+			subscriptionID, err := cmd.Flags().GetString("subscription-id")
+			if err != nil {
+				errorMessage := err.Error()
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			if subscriptionID == "" {
+				errorMessage := "subscription-id is not set"
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			a.AzureConfig.SubID = subscriptionID
+
 			report, err := vnet.EnumerateVNets(cmd.Context(), a.AzureConfig)
 			if err != nil {
 				errorMessage := err.Error()
@@ -27,6 +40,7 @@ func (a *MethodAzure) InitVNetCommand() {
 			a.OutputSignal.Content = report
 		},
 	}
+	enumerateCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
 
 	vnetCmd.AddCommand(enumerateCmd)
 	a.RootCmd.AddCommand(vnetCmd)

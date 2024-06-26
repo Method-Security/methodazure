@@ -19,6 +19,19 @@ func (a *MethodAzure) InitDatabaseCommand() {
 		Short: "Enumerate managed Database instances",
 		Long:  `Enumerate managed Database instances; retreives managed SQL, Postgres, and Postgres Flexible instance details`,
 		Run: func(cmd *cobra.Command, args []string) {
+			subscriptionID, err := cmd.Flags().GetString("subscription-id")
+			if err != nil {
+				errorMessage := err.Error()
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			if subscriptionID == "" {
+				errorMessage := "subscription-id is not set"
+				a.OutputSignal.ErrorMessage = &errorMessage
+				a.OutputSignal.Status = 1
+			}
+			a.AzureConfig.SubID = subscriptionID
+
 			report, err := database.EnumerateDatabaseInstances(cmd.Context(), a.AzureConfig)
 			if err != nil {
 				errorMessage := err.Error()
@@ -28,6 +41,7 @@ func (a *MethodAzure) InitDatabaseCommand() {
 			a.OutputSignal.Content = report
 		},
 	}
+	enumerateCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
 
 	databaseCmd.AddCommand(enumerateCmd)
 	a.RootCmd.AddCommand(databaseCmd)

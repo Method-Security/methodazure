@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -65,24 +64,6 @@ func (a *MethodAzure) InitRootCommand() {
 		Short: "methodazure CLI",
 		Long:  `methodazure CLI`,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			subscriptionID, err := cmd.Flags().GetString("subscription-id")
-			if err != nil {
-				return err
-			}
-			if subscriptionID == "" {
-				fmt.Print("Warning - flag subscription-id is not set; several commands require this flag to be set\n")
-			}
-			a.AzureConfig.SubID = subscriptionID
-
-			graphServiceEndpoint, err := cmd.Flags().GetString("graph-service-endpoint")
-			if err != nil {
-				return err
-			}
-			if graphServiceEndpoint == "" {
-				fmt.Print("Warning - flag graph-service-endpoint is not set; several commands require this flag to be set\n")
-			}
-			a.AzureConfig.GraphServiceEndpoint = graphServiceEndpoint
-
 			tenantID := os.Getenv("AZURE_TENANT_ID")
 			if tenantID == "" {
 				return errors.New("AZURE_TENANT_ID environment variable is not set")
@@ -125,8 +106,6 @@ func (a *MethodAzure) InitRootCommand() {
 
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Quiet, "quiet", "q", false, "Suppress output")
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Verbose, "verbose", "v", false, "Verbose output")
-	a.RootCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
-	a.RootCmd.PersistentFlags().StringP("graph-service-endpoint", "g", "https://graph.microsoft.com/.default", "Microsoft Graph Service Endpoint")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFile, "output-file", "f", "", "Path to output file. If blank, will output to STDOUT")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "signal", "Output format (signal, json, yaml). Default value is signal")
 

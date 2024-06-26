@@ -12,13 +12,13 @@ import (
 
 // AzureResources contains details about all Tenants.
 type AzureResources struct {
-	Tenants []armsubscriptions.TenantIDDescription `json:"tenants"`
+	Tenants []armsubscriptions.TenantIDDescription `json:"tenants" yaml:"tenants"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources"`
-	Errors    []string       `json:"errors"`
+	Resources AzureResources `json:"resources" yaml:"resources"`
+	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
 func EnumerateTenants(ctx context.Context, cfg config.AzureConfig) (*AzureResourceReport, error) {

@@ -12,13 +12,13 @@ import (
 
 // AzureResources contains details about all Subscriptions.
 type AzureResources struct {
-	Subscriptions []armsubscriptions.Subscription `json:"subscriptions"`
+	Subscriptions []armsubscriptions.Subscription `json:"subscriptions" yaml:"subscriptions"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources"`
-	Errors    []string       `json:"errors"`
+	Resources AzureResources `json:"resources" yaml:"resources"`
+	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
 func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig) (*AzureResourceReport, error) {

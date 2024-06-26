@@ -24,13 +24,12 @@ Usage:
   methodazure entra enumerate [flags]
 
 Flags:
-  -h, --help   help for enumerate
+  -g, --graph-service-endpoint string   Microsoft Graph Service Endpoint (default "https://graph.microsoft.com/.default")
+  -h, --help                            help for enumerate
 
 Global Flags:
-  -g, --graph-service-endpoint string   Microsoft Graph Service Endpoint (default "https://graph.microsoft.com/.default")
-  -o, --output string                   Output format (signal, json, yaml). Default value is signal (default "signal")
-  -f, --output-file string              Path to output file. If blank, will output to STDOUT
-  -q, --quiet                           Suppress output
-  -s, --subscription-id string          Azure subscription ID
-  -v, --verbose                         Verbose output
+  -o, --output string        Output format (signal, json, yaml). Default value is signal (default "signal")
+  -f, --output-file string   Path to output file. If blank, will output to STDOUT
+  -q, --quiet                Suppress output
+  -v, --verbose              Verbose output
 ```
