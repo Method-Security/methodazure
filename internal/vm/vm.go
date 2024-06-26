@@ -16,51 +16,51 @@ import (
 
 // IPFqdnMapping provides a mapping between an IP address and an FQDN.
 type IPFqdnMapping struct {
-	IP   string `json:"ip" yaml:"ip"`
-	FQDN string `json:"fqdn" yaml:"fqdn"`
+	IP   string `json:"ip"`
+	FQDN string `json:"fqdn"`
 }
 
 // NetworkInterface contains details about a single network interface and its corresponding IP addresses and FQDNs.
 type NetworkInterface struct {
-	ID      string               `json:"id" yaml:"id"`
-	Details armnetwork.Interface `json:"details" yaml:"details"`
-	IPFqdns []IPFqdnMapping      `json:"ip_fqdn" yaml:"ip_fqdn"`
+	ID      string               `json:"id"`
+	Details armnetwork.Interface `json:"details"`
+	IPFqdns []IPFqdnMapping      `json:"ip_fqdn"`
 }
 
 // SubnetDetails contains details about a single subnet.
 type SubnetDetails struct {
-	ID            string `json:"id" yaml:"id"`
-	AddressPrefix string `json:"address_prefix" yaml:"address_prefix"`
+	ID            string `json:"id"`
+	AddressPrefix string `json:"address_prefix"`
 }
 
 // VirtualMachine contains details about a single Virtual Machine and its corresponding network interfaces and linked subnets.
 type VirtualMachine struct {
-	Details             armcompute.VirtualMachine `json:"details" yaml:"details"`
-	VNetID              string                    `json:"vnet_id" yaml:"vnet_id"`
-	NetworkInterfaces   []NetworkInterface        `json:"network_interfaces" yaml:"network_interfaces"`
-	LinkedSubnetDetails []SubnetDetails           `json:"linked_subnet_details" yaml:"linked_subnet_details"`
+	Details             armcompute.VirtualMachine `json:"details"`
+	VNetID              string                    `json:"vnet_id"`
+	NetworkInterfaces   []NetworkInterface        `json:"network_interfaces"`
+	LinkedSubnetDetails []SubnetDetails           `json:"linked_subnet_details"`
 }
 
 // VirtualMachineScaleSetVM contains details about a single Virtual Machine Scale Set VM and its corresponding network
 // interfaces and linked subnets.
 type VirtualMachineScaleSetVM struct {
-	Details             armcompute.VirtualMachineScaleSetVM `json:"details" yaml:"details"`
-	VNetID              string                              `json:"vnet_id" yaml:"vnet_id"`
-	NetworkInterfaces   []NetworkInterface                  `json:"network_interfaces" yaml:"network_interfaces"`
-	LinkedSubnetDetails []SubnetDetails                     `json:"linked_subnet_details" yaml:"linked_subnet_details"`
+	Details             armcompute.VirtualMachineScaleSetVM `json:"details"`
+	VNetID              string                              `json:"vnet_id"`
+	NetworkInterfaces   []NetworkInterface                  `json:"network_interfaces"`
+	LinkedSubnetDetails []SubnetDetails                     `json:"linked_subnet_details"`
 }
 
 // AzureResources contains details about all VM related resources in the subscription.
 type AzureResources struct {
-	SubscriptionID        string                     `json:"subscription_id" yaml:"subscription_id"`
-	StandaloneVMInstances []VirtualMachine           `json:"standalone_vms" yaml:"standalone_vms"`
-	VMSSVMInstances       []VirtualMachineScaleSetVM `json:"vmss_vms" yaml:"vmss_vms"`
+	SubscriptionID        string                     `json:"subscription_id"`
+	StandaloneVMInstances []VirtualMachine           `json:"standalone_vms"`
+	VMSSVMInstances       []VirtualMachineScaleSetVM `json:"vmss_vms"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources" yaml:"resources"`
-	Errors    []string       `json:"errors" yaml:"errors"`
+	Resources AzureResources `json:"resources"`
+	Errors    []string       `json:"errors"`
 }
 
 // EnumerateVMs enumerates all VM related resources in the subscription, returning a report of the resources and any non-fatal

@@ -12,23 +12,23 @@ import (
 
 // Details contains details about a single VNet.
 type Details struct {
-	VNetName        string                    `json:"vnet_name" yaml:"vnet_name"`
-	Location        string                    `json:"location" yaml:"location"`
-	ResourceGroup   string                    `json:"resource_group" yaml:"resource_group"`
-	ResourceGroupID string                    `json:"resource_group_id" yaml:"resource_group_id"`
-	Details         armnetwork.VirtualNetwork `json:"details" yaml:"details"`
+	VNetName        string                    `json:"vnet_name"`
+	Location        string                    `json:"location"`
+	ResourceGroup   string                    `json:"resource_group"`
+	ResourceGroupID string                    `json:"resource_group_id"`
+	Details         armnetwork.VirtualNetwork `json:"details"`
 }
 
 // AzureResources contains details about all VNets in the subscription.
 type AzureResources struct {
-	SubscriptionID  string    `json:"subscription_id" yaml:"subscription_id"`
-	VirtualNetworks []Details `json:"virtual_networks" yaml:"virtual_networks"`
+	SubscriptionID  string    `json:"subscription_id"`
+	VirtualNetworks []Details `json:"virtual_networks"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources" yaml:"resources"`
-	Errors    []string       `json:"errors" yaml:"errors"`
+	Resources AzureResources `json:"resources"`
+	Errors    []string       `json:"errors"`
 }
 
 // EnumerateVNets enumerates all VNets in the subscription, returning a report of the VNets and any non-fatal errors encountered.

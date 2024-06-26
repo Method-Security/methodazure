@@ -17,13 +17,9 @@ nav:
         - AKS: docs/aks.md
         - Database: docs/database.md
         - DNS: docs/dns.md
-        - Entra: docs/entra.md
-        - IAM: docs/iam.md
         - Network Security Groups: docs/nsg.md
         - Resource Groups: docs/resourcegroup.md
         - Storage: docs/storage.md
-        - Subscriptions: docs/subscription.md
-        - Tenants: docs/tenant.md
         - VMs: docs/vm.md
         - Virtual Networks: docs/vnet.md
   - Contributing:
@@ -32,7 +28,6 @@ nav:
           - Setup: development/setup.md
           - Project Principles: development/principles.md
           - Adding New Capabilities: development/adding.md
-          - Azure Development Tips: development/azure-dev.md
 theme:
   name: material
   language: "en"

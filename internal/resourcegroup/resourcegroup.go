@@ -11,21 +11,21 @@ import (
 
 // Details contains details about a single Resource Group.
 type Details struct {
-	ResourceGroupName string                     `json:"resource_group_name" yaml:"resource_group_name"`
-	Location          string                     `json:"location" yaml:"location"`
-	Details           armresources.ResourceGroup `json:"details" yaml:"details"`
+	ResourceGroupName string                     `json:"resource_group_name"`
+	Location          string                     `json:"location"`
+	Details           armresources.ResourceGroup `json:"details"`
 }
 
 // AzureResources contains details about all Resource Groups in the subscription.
 type AzureResources struct {
-	SubscriptionID string    `json:"subscription_id" yaml:"subscription_id"`
-	ResourceGroups []Details `json:"resource_groups" yaml:"resource_groups"`
+	SubscriptionID string    `json:"subscription_id"`
+	ResourceGroups []Details `json:"resource_groups"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources" yaml:"resources"`
-	Errors    []string       `json:"errors" yaml:"errors"`
+	Resources AzureResources `json:"resources"`
+	Errors    []string       `json:"errors"`
 }
 
 // EnumerateResourceGroups enumerates all Resource Groups in the subscription, returning a report of the Resource Groups and any

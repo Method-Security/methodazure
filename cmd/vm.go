@@ -8,7 +8,7 @@ import (
 // InitVMCommand initializes the `methodazure vm` subcommand that deals with enumerating Virtual Machines in the
 // Azure environment.
 func (a *MethodAzure) InitVMCommand() {
-	vmCmd := &cobra.Command{
+	a.VMCmd = &cobra.Command{
 		Use:   "vm",
 		Short: "Audit and command Virtual Machines",
 		Long:  `Audit and command Virtual Machines`,
@@ -19,19 +19,6 @@ func (a *MethodAzure) InitVMCommand() {
 		Short: "Enumerate Virtual Machines",
 		Long:  `Enumerate Virtual Machines`,
 		Run: func(cmd *cobra.Command, args []string) {
-			subscriptionID, err := cmd.Flags().GetString("subscription-id")
-			if err != nil {
-				errorMessage := err.Error()
-				a.OutputSignal.ErrorMessage = &errorMessage
-				a.OutputSignal.Status = 1
-			}
-			if subscriptionID == "" {
-				errorMessage := "subscription-id is not set"
-				a.OutputSignal.ErrorMessage = &errorMessage
-				a.OutputSignal.Status = 1
-			}
-			a.AzureConfig.SubID = subscriptionID
-
 			report, err := vm.EnumerateVMs(cmd.Context(), a.AzureConfig)
 			if err != nil {
 				errorMessage := err.Error()
@@ -41,8 +28,7 @@ func (a *MethodAzure) InitVMCommand() {
 			a.OutputSignal.Content = report
 		},
 	}
-	enumerateCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
 
-	vmCmd.AddCommand(enumerateCmd)
-	a.RootCmd.AddCommand(vmCmd)
+	a.VMCmd.AddCommand(enumerateCmd)
+	a.RootCmd.AddCommand(a.VMCmd)
 }

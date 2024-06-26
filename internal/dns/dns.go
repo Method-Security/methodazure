@@ -14,32 +14,32 @@ import (
 
 // ZoneDetails contains details about a single DNS zone and the record sets in the zone.
 type ZoneDetails struct {
-	ZoneName        string             `json:"zone_name" yaml:"zone_name"`
-	ResourceGroup   string             `json:"resource_group" yaml:"resource_group"`
-	ResourceGroupID string             `json:"resource_group_id" yaml:"resource_group_id"`
-	Details         armdns.Zone        `json:"details" yaml:"details"`
-	RecordSets      []armdns.RecordSet `json:"record_sets" yaml:"record_sets"`
+	ZoneName        string             `json:"zone_name"`
+	ResourceGroup   string             `json:"resource_group"`
+	ResourceGroupID string             `json:"resource_group_id"`
+	Details         armdns.Zone        `json:"details"`
+	RecordSets      []armdns.RecordSet `json:"record_sets"`
 }
 
 // TrafficManagerProfileDetails contains details about a single Traffic Manager profile.
 type TrafficManagerProfileDetails struct {
-	ProfileName     string                    `json:"profile_name" yaml:"profile_name"`
-	ResourceGroup   string                    `json:"resource_group" yaml:"resource_group"`
-	ResourceGroupID string                    `json:"resource_group_id" yaml:"resource_group_id"`
-	Details         armtrafficmanager.Profile `json:"details" yaml:"details"`
+	ProfileName     string                    `json:"profile_name"`
+	ResourceGroup   string                    `json:"resource_group"`
+	ResourceGroupID string                    `json:"resource_group_id"`
+	Details         armtrafficmanager.Profile `json:"details"`
 }
 
 // AzureResources contains details about all DNS related resources in the subscription.
 type AzureResources struct {
-	SubscriptionID         string                         `json:"subscription_id" yaml:"subscription_id"`
-	DNSZones               []ZoneDetails                  `json:"dns_zones" yaml:"dns_zones"`
-	TrafficManagerProfiles []TrafficManagerProfileDetails `json:"traffic_manager_profiles" yaml:"traffic_manager_profiles"`
+	SubscriptionID         string                         `json:"subscription_id"`
+	DNSZones               []ZoneDetails                  `json:"dns_zones"`
+	TrafficManagerProfiles []TrafficManagerProfileDetails `json:"traffic_manager_profiles"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources" yaml:"resources"`
-	Errors    []string       `json:"errors" yaml:"errors"`
+	Resources AzureResources `json:"resources"`
+	Errors    []string       `json:"errors"`
 }
 
 // EnumerateDNSResources enumerates all DNS related resources in the subscription, returning a report of the resources and

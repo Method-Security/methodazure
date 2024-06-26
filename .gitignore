@@ -34,7 +34,3 @@ go.work.sum
 
 # Don't ignore vendors
 !vendor/**
-
-# IDE
-.idea/
-.vscode/
