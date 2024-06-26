@@ -11,6 +11,8 @@ type RootFlags struct {
 }
 
 type AzureConfig struct {
-	Cred  *azidentity.DefaultAzureCredential
-	SubID string
+	Cred                 *azidentity.DefaultAzureCredential
+	TenantID             string
+	SubID                string
+	GraphServiceEndpoint string
 }

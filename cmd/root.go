@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"errors"
+	"os"
 	"strings"
 	"time"
 
@@ -22,21 +23,13 @@ import (
 // for use by subcommands. The output signal is used to write the output of the command to the desired output format
 // after the execution of the invoked commands Run function.
 type MethodAzure struct {
-	Version           string
-	RootFlags         config.RootFlags
-	AzureConfig       config.AzureConfig
-	OutputConfig      writer.OutputConfig
-	OutputSignal      signal.Signal
-	RootCmd           *cobra.Command
-	VersionCmd        *cobra.Command
-	VMCmd             *cobra.Command
-	StorageAccountCmd *cobra.Command
-	AKSCmd            *cobra.Command
-	DatabaseCmd       *cobra.Command
-	DNSCmd            *cobra.Command
-	VNetCmd           *cobra.Command
-	ResourceGroupCmd  *cobra.Command
-	NSGCmd            *cobra.Command
+	Version      string
+	RootFlags    config.RootFlags
+	AzureConfig  config.AzureConfig
+	OutputConfig writer.OutputConfig
+	OutputSignal signal.Signal
+	RootCmd      *cobra.Command
+	VersionCmd   *cobra.Command
 }
 
 // NewMethodAzure returns a new MethodAzure struct with the provided version string. The MethodAzure struct is used to
@@ -71,14 +64,11 @@ func (a *MethodAzure) InitRootCommand() {
 		Short: "methodazure CLI",
 		Long:  `methodazure CLI`,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			subscriptionID, err := cmd.Flags().GetString("subscription-id")
-			if err != nil {
-				return err
+			tenantID := os.Getenv("AZURE_TENANT_ID")
+			if tenantID == "" {
+				return errors.New("AZURE_TENANT_ID environment variable is not set")
 			}
-			if subscriptionID == "" {
-				return errors.New("flag subscription-id is not set")
-			}
-			a.AzureConfig.SubID = subscriptionID
+			a.AzureConfig.TenantID = tenantID
 
 			cred, err := azidentity.NewDefaultAzureCredential(nil)
 			if err != nil {
@@ -116,7 +106,6 @@ func (a *MethodAzure) InitRootCommand() {
 
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Quiet, "quiet", "q", false, "Suppress output")
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Verbose, "verbose", "v", false, "Verbose output")
-	a.RootCmd.PersistentFlags().StringP("subscription-id", "s", "", "Azure subscription ID")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFile, "output-file", "f", "", "Path to output file. If blank, will output to STDOUT")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "signal", "Output format (signal, json, yaml). Default value is signal")
 

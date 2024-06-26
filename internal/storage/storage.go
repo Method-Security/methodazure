@@ -13,25 +13,25 @@ import (
 
 // Details contains details about a single Storage Account.
 type Details struct {
-	AccountName     string                         `json:"account_name"`
-	Location        string                         `json:"location"`
-	ResourceGroup   string                         `json:"resource_group"`
-	ResourceGroupID string                         `json:"resource_group_id"`
-	Details         armstorage.Account             `json:"details"`
-	VNetID          string                         `json:"vnet_id"`
-	BlobContainers  []armstorage.ListContainerItem `json:"blob_containers"`
+	AccountName     string                         `json:"account_name" yaml:"account_name"`
+	Location        string                         `json:"location" yaml:"location"`
+	ResourceGroup   string                         `json:"resource_group" yaml:"resource_group"`
+	ResourceGroupID string                         `json:"resource_group_id" yaml:"resource_group_id"`
+	Details         armstorage.Account             `json:"details" yaml:"details"`
+	VNetID          string                         `json:"vnet_id" yaml:"vnet_id"`
+	BlobContainers  []armstorage.ListContainerItem `json:"blob_containers" yaml:"blob_containers"`
 }
 
 // AzureResources contains details about all Storage Accounts in the subscription.
 type AzureResources struct {
-	SubscriptionID  string    `json:"subscription_id"`
-	StorageAccounts []Details `json:"storage_accounts"`
+	SubscriptionID  string    `json:"subscription_id" yaml:"subscription_id"`
+	StorageAccounts []Details `json:"storage_accounts" yaml:"storage_accounts"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources"`
-	Errors    []string       `json:"errors"`
+	Resources AzureResources `json:"resources" yaml:"resources"`
+	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
 // EnumerateStorageAccounts enumerates all Storage Accounts in the subscription, returning a report of the accounts and any

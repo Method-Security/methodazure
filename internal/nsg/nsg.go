@@ -12,23 +12,23 @@ import (
 
 // Details contains details about a single NSG and the rules in the NSG.
 type Details struct {
-	NSGName         string                   `json:"nsg_name"`
-	Location        string                   `json:"location"`
-	ResourceGroup   string                   `json:"resource_group"`
-	ResourceGroupID string                   `json:"resource_group_id"`
-	Details         armnetwork.SecurityGroup `json:"details"`
+	NSGName         string                   `json:"nsg_name" yaml:"nsg_name"`
+	Location        string                   `json:"location" yaml:"location"`
+	ResourceGroup   string                   `json:"resource_group" yaml:"resource_group"`
+	ResourceGroupID string                   `json:"resource_group_id" yaml:"resource_group_id"`
+	Details         armnetwork.SecurityGroup `json:"details" yaml:"details"`
 }
 
 // AzureResources contains details about all NSGs in the subscription.
 type AzureResources struct {
-	SubscriptionID        string    `json:"subscription_id"`
-	NetworkSecurityGroups []Details `json:"network_security_groups"`
+	SubscriptionID        string    `json:"subscription_id" yaml:"subscription_id"`
+	NetworkSecurityGroups []Details `json:"network_security_groups" yaml:"network_security_groups"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources"`
-	Errors    []string       `json:"errors"`
+	Resources AzureResources `json:"resources" yaml:"resources"`
+	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
 // EnumerateNSGs enumerates all NSGs in the subscription, returning a report of the NSGs and any non-fatal errors encountered.

@@ -15,46 +15,46 @@ import (
 
 // SQLInstanceDetails contains details about a single SQL instance.
 type SQLInstanceDetails struct {
-	InstanceName    string                 `json:"instance_name"`
-	Location        string                 `json:"location"`
-	ResourceGroup   string                 `json:"resource_group"`
-	ResourceGroupID string                 `json:"resource_group_id"`
-	VNetID          string                 `json:"vnet_id"`
-	Details         armsql.ManagedInstance `json:"details"`
+	InstanceName    string                 `json:"instance_name" yaml:"instance_name"`
+	Location        string                 `json:"location" yaml:"location"`
+	ResourceGroup   string                 `json:"resource_group" yaml:"resource_group"`
+	ResourceGroupID string                 `json:"resource_group_id" yaml:"resource_group_id"`
+	VNetID          string                 `json:"vnet_id" yaml:"vnet_id"`
+	Details         armsql.ManagedInstance `json:"details" yaml:"details"`
 }
 
 // PostgresInstanceDetails contains details about a single PostgreSQL instance.
 type PostgresInstanceDetails struct {
-	InstanceName    string               `json:"instance_name"`
-	Location        string               `json:"location"`
-	ResourceGroup   string               `json:"resource_group"`
-	ResourceGroupID string               `json:"resource_group_id"`
-	VNetID          string               `json:"vnet_id"`
-	Details         armpostgresql.Server `json:"details"`
+	InstanceName    string               `json:"instance_name" yaml:"instance_name"`
+	Location        string               `json:"location" yaml:"location"`
+	ResourceGroup   string               `json:"resource_group" yaml:"resource_group"`
+	ResourceGroupID string               `json:"resource_group_id" yaml:"resource_group_id"`
+	VNetID          string               `json:"vnet_id" yaml:"vnet_id"`
+	Details         armpostgresql.Server `json:"details" yaml:"details"`
 }
 
 // PostgresFlexibleInstanceDetails contains details about a single PostgreSQL Flexible instance.
 type PostgresFlexibleInstanceDetails struct {
-	InstanceName    string                              `json:"instance_name"`
-	Location        string                              `json:"location"`
-	ResourceGroup   string                              `json:"resource_group"`
-	ResourceGroupID string                              `json:"resource_group_id"`
-	VNetID          string                              `json:"vnet_id"`
-	Details         armpostgresqlflexibleservers.Server `json:"details"`
+	InstanceName    string                              `json:"instance_name" yaml:"instance_name"`
+	Location        string                              `json:"location" yaml:"location"`
+	ResourceGroup   string                              `json:"resource_group" yaml:"resource_group"`
+	ResourceGroupID string                              `json:"resource_group_id" yaml:"resource_group_id"`
+	VNetID          string                              `json:"vnet_id" yaml:"vnet_id"`
+	Details         armpostgresqlflexibleservers.Server `json:"details" yaml:"details"`
 }
 
 // AzureResources contains details about all database instances in the subscription.
 type AzureResources struct {
-	SubscriptionID            string                            `json:"subscription_id"`
-	SQLInstances              []SQLInstanceDetails              `json:"sql_instances"`
-	PostgresInstances         []PostgresInstanceDetails         `json:"postgres_instances"`
-	PostgresFlexibleInstances []PostgresFlexibleInstanceDetails `json:"postgres_flexible_instances"`
+	SubscriptionID            string                            `json:"subscription_id" yaml:"subscription_id"`
+	SQLInstances              []SQLInstanceDetails              `json:"sql_instances" yaml:"sql_instances"`
+	PostgresInstances         []PostgresInstanceDetails         `json:"postgres_instances" yaml:"postgres_instances"`
+	PostgresFlexibleInstances []PostgresFlexibleInstanceDetails `json:"postgres_flexible_instances" yaml:"postgres_flexible_instances"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
 type AzureResourceReport struct {
-	Resources AzureResources `json:"resources"`
-	Errors    []string       `json:"errors"`
+	Resources AzureResources `json:"resources" yaml:"resources"`
+	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
 // EnumerateDatabaseInstances enumerates all managed Database instances in the subscription, returning a report of the
