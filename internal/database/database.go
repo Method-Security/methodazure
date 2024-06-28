@@ -46,6 +46,7 @@ type PostgresFlexibleInstanceDetails struct {
 // AzureResources contains details about all database instances in the subscription.
 type AzureResources struct {
 	SubscriptionID            string                            `json:"subscription_id" yaml:"subscription_id"`
+	TenantID                  string                            `json:"tenant_id" yaml:"tenant_id"`
 	SQLInstances              []SQLInstanceDetails              `json:"sql_instances" yaml:"sql_instances"`
 	PostgresInstances         []PostgresInstanceDetails         `json:"postgres_instances" yaml:"postgres_instances"`
 	PostgresFlexibleInstances []PostgresFlexibleInstanceDetails `json:"postgres_flexible_instances" yaml:"postgres_flexible_instances"`
@@ -85,6 +86,7 @@ func EnumerateDatabaseInstances(ctx context.Context, cfg config.AzureConfig) (*A
 	}
 
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,

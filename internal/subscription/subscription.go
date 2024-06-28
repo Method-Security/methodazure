@@ -4,8 +4,10 @@ package subscription
 import (
 	"context"
 	"fmt"
-	"log"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions"
 	"github.com/Method-Security/methodazure/internal/config"
 )
@@ -21,28 +23,37 @@ type AzureResourceReport struct {
 	Errors    []string       `json:"errors" yaml:"errors"`
 }
 
-func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig) (*AzureResourceReport, error) {
+// EnumerateSubscriptions enumerates all managed Subscriptions acrtoss a specified list of Azure Clouds (e.g. Public, Government),
+// returning a report of the subscriptions and any non-fatal errors encountered.
+func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig, specifiedClouds []cloud.Configuration) (*AzureResourceReport, error) {
 	resources := AzureResources{}
 	subscriptions := []armsubscriptions.Subscription{}
 	errors := []string{}
 
-	clientFactory, err := armsubscriptions.NewClientFactory(cfg.Cred, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create subscription client factory: %v", err)
-	}
-
-	// Create a pager to list all Tenants this credential has haccess to
-	pager := clientFactory.NewClient().NewListPager(nil)
-
-	// Loop through the pages and get Tenants
-	for pager.More() {
-		page, err := pager.NextPage(ctx)
-		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+	for _, specifiedCloud := range specifiedClouds {
+		clientOptions := &armpolicy.ClientOptions{
+			ClientOptions: policy.ClientOptions{
+				Cloud: specifiedCloud,
+			},
 		}
-		for _, subscription := range page.Value {
-			subscriptions = append(subscriptions, *subscription)
+		clientFactory, err := armsubscriptions.NewClientFactory(cfg.Cred, clientOptions)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create subscription client factory: %v", err)
+		}
+
+		// Create a pager to list all Tenants this credential has haccess to
+		pager := clientFactory.NewClient().NewListPager(nil)
+
+		// Loop through the pages and get Tenants
+		for pager.More() {
+			page, err := pager.NextPage(ctx)
+			if err != nil {
+				errors = append(errors, err.Error())
+				break // This likely indicates that the tenant has no haccess to any subscriptions
+			}
+			for _, subscription := range page.Value {
+				subscriptions = append(subscriptions, *subscription)
+			}
 		}
 	}
 

@@ -23,11 +23,13 @@ func (a *MethodAzure) InitEntraCommand() {
 				errorMessage := err.Error()
 				a.OutputSignal.ErrorMessage = &errorMessage
 				a.OutputSignal.Status = 1
+				return
 			}
 			if graphServiceEndpoint == "" {
 				errorMessage := "graph-service-endpoint is not set"
 				a.OutputSignal.ErrorMessage = &errorMessage
 				a.OutputSignal.Status = 1
+				return
 			}
 			a.AzureConfig.GraphServiceEndpoint = graphServiceEndpoint
 
