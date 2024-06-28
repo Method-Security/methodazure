@@ -2,9 +2,8 @@ package cmd
 
 import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
-	"github.com/spf13/cobra"
-
 	"github.com/Method-Security/methodazure/internal/subscription"
+	"github.com/spf13/cobra"
 )
 
 // InitSubscriptionCommand initializes the `methodazure subscription` subcommand that deals with enumerating Azure Subscription related details.
@@ -20,7 +19,7 @@ func (a *MethodAzure) InitSubscriptionCommand() {
 		Short: "Enumerate Subscriptions for the provided credentials",
 		Long:  `Enumerate Subscriptions for the provided credentials`,
 		Run: func(cmd *cobra.Command, args []string) {
-			clouds := []cloud.Configuration{cloud.AzurePublic}
+			var clouds []cloud.Configuration
 			tryAllClouds, err := cmd.Flags().GetBool("try-all-clouds")
 			if err != nil {
 				errorMessage := err.Error()

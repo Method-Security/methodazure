@@ -9,7 +9,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions"
-
 	"github.com/Method-Security/methodazure/internal/config"
 )
 
@@ -41,10 +40,10 @@ func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig, specifi
 		if err != nil {
 			return nil, fmt.Errorf("failed to create subscription client factory: %v", err)
 		}
-	
+
 		// Create a pager to list all Tenants this credential has haccess to
 		pager := clientFactory.NewClient().NewListPager(nil)
-	
+
 		// Loop through the pages and get Tenants
 		for pager.More() {
 			page, err := pager.NextPage(ctx)

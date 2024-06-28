@@ -21,11 +21,11 @@ type NodePoolDetails struct {
 
 // ClusterDetails contains details about a single AKS cluster, including the cluster details and node pools.
 type ClusterDetails struct {
-	Name          	string                             `json:"cluster_name" yaml:"cluster_name"`
-	ResourceGroup 	string                             `json:"resource_group" yaml:"resource_group"`
+	Name            string                             `json:"cluster_name" yaml:"cluster_name"`
+	ResourceGroup   string                             `json:"resource_group" yaml:"resource_group"`
 	ResourceGroupID string                             `json:"resource_group_id" yaml:"resource_group_id"`
-	Details       	armcontainerservice.ManagedCluster `json:"details" yaml:"details"`
-	NodePools     	[]NodePoolDetails                  `json:"node_pools" yaml:"node_pools"`
+	Details         armcontainerservice.ManagedCluster `json:"details" yaml:"details"`
+	NodePools       []NodePoolDetails                  `json:"node_pools" yaml:"node_pools"`
 }
 
 // AzureResources contains details about all AKS clusters in the subscription.
