@@ -69,7 +69,13 @@ func EnumerateStorageAccounts(ctx context.Context, cfg config.AzureConfig) (*Azu
 
 			// Get the VNet ID for the storage account
 			if storageAccount.Properties.NetworkRuleSet != nil {
-				vNetName := azure.GetVNetNameFromID(*storageAccount.Properties.NetworkRuleSet.VirtualNetworkRules[0].VirtualNetworkResourceID)
+				var vNetName string
+				if len(storageAccount.Properties.NetworkRuleSet.VirtualNetworkRules) > 0 {
+					vNetName = azure.GetVNetNameFromID(*storageAccount.Properties.NetworkRuleSet.VirtualNetworkRules[0].VirtualNetworkResourceID)
+				} else {
+					log.Printf("no virtual network rules found for storage account %s", *storageAccount.Name)
+					errors = append(errors, fmt.Sprintf("no virtual network rules found for storage account %s", *storageAccount.Name))
+				}
 				vNetID, err := azure.GetVNetIDFromVNetName(ctx, cfg, storageAccountDetails.ResourceGroup, vNetName)
 				if err != nil {
 					log.Printf("failed to get VNet ID: %v", err)
