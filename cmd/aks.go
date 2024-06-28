@@ -23,11 +23,13 @@ func (a *MethodAzure) InitAKSCommand() {
 				errorMessage := err.Error()
 				a.OutputSignal.ErrorMessage = &errorMessage
 				a.OutputSignal.Status = 1
+				return
 			}
 			if subscriptionID == "" {
 				errorMessage := "subscription-id is not set"
 				a.OutputSignal.ErrorMessage = &errorMessage
 				a.OutputSignal.Status = 1
+				return
 			}
 			a.AzureConfig.SubID = subscriptionID
 

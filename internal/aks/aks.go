@@ -21,15 +21,17 @@ type NodePoolDetails struct {
 
 // ClusterDetails contains details about a single AKS cluster, including the cluster details and node pools.
 type ClusterDetails struct {
-	Name          string                             `json:"cluster_name" yaml:"cluster_name"`
-	ResourceGroup string                             `json:"resource_group" yaml:"resource_group"`
-	Details       armcontainerservice.ManagedCluster `json:"details" yaml:"details"`
-	NodePools     []NodePoolDetails                  `json:"node_pools" yaml:"node_pools"`
+	Name          	string                             `json:"cluster_name" yaml:"cluster_name"`
+	ResourceGroup 	string                             `json:"resource_group" yaml:"resource_group"`
+	ResourceGroupID string                             `json:"resource_group_id" yaml:"resource_group_id"`
+	Details       	armcontainerservice.ManagedCluster `json:"details" yaml:"details"`
+	NodePools     	[]NodePoolDetails                  `json:"node_pools" yaml:"node_pools"`
 }
 
 // AzureResources contains details about all AKS clusters in the subscription.
 type AzureResources struct {
 	SubscriptionID string           `json:"subscription_id" yaml:"subscription_id"`
+	TenantID       string           `json:"tenant_id" yaml:"tenant_id"`
 	AKSClusters    []ClusterDetails `json:"aks_clusters" yaml:"aks_clusters"`
 }
 
@@ -70,6 +72,7 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 				ResourceGroup: resourceGroup,
 				Details:       *cluster,
 			}
+			clusterDetails.ResourceGroupID = azure.GetResourceGroupIDFromName(cfg.SubID, clusterDetails.ResourceGroup)
 
 			// List node pools in the cluster
 			nodePools, err := listNodePools(ctx, cfg, resourceGroup, *cluster.Name, *cluster.Properties.NodeResourceGroup)
@@ -88,6 +91,7 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 		resources.AKSClusters = aksClusters
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 	report := AzureResourceReport{
 		Resources: resources,
 		Errors:    errors,
