@@ -2,6 +2,7 @@
 package config
 
 import (
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 )
 
@@ -15,4 +16,5 @@ type AzureConfig struct {
 	TenantID             string
 	SubID                string
 	GraphServiceEndpoint string
+	CloudConfig          cloud.Configuration
 }

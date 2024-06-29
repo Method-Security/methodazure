@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/dns/armdns"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/trafficmanager/armtrafficmanager"
 	"github.com/Method-Security/methodazure/internal/azure"
@@ -80,7 +82,12 @@ func EnumerateDNSResources(ctx context.Context, cfg config.AzureConfig) (*AzureR
 func listDNSZones(ctx context.Context, cfg config.AzureConfig) ([]ZoneDetails, error) {
 	var dnsZones []ZoneDetails
 
-	clientFactory, err := armdns.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armdns.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create DNS client factory: %v", err)
 	}
@@ -118,7 +125,12 @@ func listDNSZones(ctx context.Context, cfg config.AzureConfig) ([]ZoneDetails, e
 func listRecordSets(ctx context.Context, cfg config.AzureConfig, resourceGroup string, dnsZoneName string) ([]armdns.RecordSet, error) {
 	var recordSets []armdns.RecordSet
 
-	clientFactory, err := armdns.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armdns.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create DNS client factory: %v", err)
 	}
@@ -140,7 +152,12 @@ func listRecordSets(ctx context.Context, cfg config.AzureConfig, resourceGroup s
 func listTrafficManagerProfiles(ctx context.Context, cfg config.AzureConfig) ([]TrafficManagerProfileDetails, error) {
 	var trafficManagerProfiles []TrafficManagerProfileDetails
 
-	clientFactory, err := armtrafficmanager.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armtrafficmanager.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create traffic manager client factory: %v", err)
 	}

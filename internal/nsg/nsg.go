@@ -3,8 +3,10 @@ package nsg
 
 import (
 	"context"
-	"log"
+	"fmt"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	"github.com/Method-Security/methodazure/internal/azure"
 	"github.com/Method-Security/methodazure/internal/config"
@@ -38,10 +40,14 @@ func EnumerateNSGs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceR
 	var networkSecurityGroups []Details
 	errors := []string{}
 
-	clientFactory, err := armnetwork.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armnetwork.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
-		log.Fatalf("failed to create network client factory: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to create network client factory: %v", err)
 	}
 
 	// Create a pager to list all NSGs in the subscription
@@ -49,8 +55,7 @@ func EnumerateNSGs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceR
 	for nsgPager.More() {
 		page, err := nsgPager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, nsg := range page.Value {
 			nsgDetails := Details{

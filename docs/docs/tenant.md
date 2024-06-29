@@ -27,6 +27,7 @@ Flags:
   -h, --help   help for enumerate
 
 Global Flags:
+  -c, --cloud-config string  Azure Cloud to use (AzurePublic, AzureGovernment, AzureChina) (default "AzurePublic")
   -o, --output string        Output format (signal, json, yaml). Default value is signal (default "signal")
   -f, --output-file string   Path to output file. If blank, will output to STDOUT
   -q, --quiet                Suppress output

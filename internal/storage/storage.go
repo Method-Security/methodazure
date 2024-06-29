@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/Method-Security/methodazure/internal/azure"
 	"github.com/Method-Security/methodazure/internal/config"
@@ -25,7 +27,7 @@ type Details struct {
 // AzureResources contains details about all Storage Accounts in the subscription.
 type AzureResources struct {
 	SubscriptionID  string    `json:"subscription_id" yaml:"subscription_id"`
-	TenantID       	string    `json:"tenant_id" yaml:"tenant_id"`
+	TenantID        string    `json:"tenant_id" yaml:"tenant_id"`
 	StorageAccounts []Details `json:"storage_accounts" yaml:"storage_accounts"`
 }
 
@@ -43,10 +45,14 @@ func EnumerateStorageAccounts(ctx context.Context, cfg config.AzureConfig) (*Azu
 	errors := []string{}
 
 	// Create a new client to interact with the storage resource provider
-	clientFactory, err := armstorage.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armstorage.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
-		log.Fatalf("failed to create client factory: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to create storage client factory: %v", err)
 	}
 
 	// Create a pager to list all storage accounts in the subscription
@@ -56,8 +62,7 @@ func EnumerateStorageAccounts(ctx context.Context, cfg config.AzureConfig) (*Azu
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, storageAccount := range page.Value {
 			storageAccountDetails := Details{
@@ -116,7 +121,12 @@ func EnumerateStorageAccounts(ctx context.Context, cfg config.AzureConfig) (*Azu
 func listBlobContainers(ctx context.Context, cfg config.AzureConfig, accountName string, resourceGroup string) ([]armstorage.ListContainerItem, error) {
 	var blobContainers []armstorage.ListContainerItem
 
-	clientFactory, err := armstorage.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armstorage.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return []armstorage.ListContainerItem{}, fmt.Errorf("failed to create client factory: %v", err)
 	}
@@ -128,7 +138,6 @@ func listBlobContainers(ctx context.Context, cfg config.AzureConfig, accountName
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
 			return []armstorage.ListContainerItem{}, fmt.Errorf("failed to advance page: %v", err)
 		}
 

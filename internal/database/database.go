@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/postgresql/armpostgresql"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/postgresql/armpostgresqlflexibleservers/v4"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql"
@@ -100,7 +102,12 @@ func listSQLInstances(ctx context.Context, cfg config.AzureConfig) ([]SQLInstanc
 	instances := []SQLInstanceDetails{}
 
 	// Create a new client to interact with the SQL resource provider
-	clientFactory, err := armsql.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armsql.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return instances, fmt.Errorf("failed to create client factory: %v", err)
 	}
@@ -143,7 +150,12 @@ func listPostgresInstances(ctx context.Context, cfg config.AzureConfig) ([]Postg
 	instances := []PostgresInstanceDetails{}
 
 	// Create a new client to interact with the PostgreSQL resource provider
-	clientFactory, err := armpostgresql.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armpostgresql.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return instances, fmt.Errorf("failed to create client factory: %v", err)
 	}
@@ -179,7 +191,12 @@ func listPostgresFlexibleInstances(ctx context.Context, cfg config.AzureConfig) 
 	instances := []PostgresFlexibleInstanceDetails{}
 
 	// Create a new client to interact with the PostgreSQL resource provider
-	clientFactory, err := armpostgresqlflexibleservers.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armpostgresqlflexibleservers.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return instances, fmt.Errorf("failed to create client factory: %v", err)
 	}

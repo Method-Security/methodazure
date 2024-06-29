@@ -4,8 +4,9 @@ package tenant
 import (
 	"context"
 	"fmt"
-	"log"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions"
 	"github.com/Method-Security/methodazure/internal/config"
 )
@@ -26,9 +27,14 @@ func EnumerateTenants(ctx context.Context, cfg config.AzureConfig) (*AzureResour
 	tenants := []armsubscriptions.TenantIDDescription{}
 	errors := []string{}
 
-	clientFactory, err := armsubscriptions.NewClientFactory(cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armsubscriptions.NewClientFactory(cfg.Cred, clientOptions)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create subscription client factory: %v", err)
+		return &AzureResourceReport{}, fmt.Errorf("failed to create subscription client factory: %v", err)
 	}
 
 	// Create a pager to list all Tenants this credential has haccess to
@@ -38,8 +44,7 @@ func EnumerateTenants(ctx context.Context, cfg config.AzureConfig) (*AzureResour
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, tenant := range page.Value {
 			tenants = append(tenants, *tenant)

@@ -12,9 +12,14 @@ import (
 	"github.com/Method-Security/methodazure/internal/config"
 )
 
+type Details struct {
+	Details       armsubscriptions.Subscription `json:"details" yaml:"details"`
+	AuthorityHost string                        `json:"authority_host" yaml:"authority_host"`
+}
+
 // AzureResources contains details about all Subscriptions.
 type AzureResources struct {
-	Subscriptions []armsubscriptions.Subscription `json:"subscriptions" yaml:"subscriptions"`
+	Subscriptions []Details `json:"subscriptions" yaml:"subscriptions"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
@@ -27,7 +32,7 @@ type AzureResourceReport struct {
 // returning a report of the subscriptions and any non-fatal errors encountered.
 func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig, specifiedClouds []cloud.Configuration) (*AzureResourceReport, error) {
 	resources := AzureResources{}
-	subscriptions := []armsubscriptions.Subscription{}
+	subscriptions := []Details{}
 	errors := []string{}
 
 	for _, specifiedCloud := range specifiedClouds {
@@ -52,7 +57,10 @@ func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig, specifi
 				break // This likely indicates that the tenant has no haccess to any subscriptions
 			}
 			for _, subscription := range page.Value {
-				subscriptions = append(subscriptions, *subscription)
+				subscriptions = append(subscriptions, Details{
+					Details:       *subscription,
+					AuthorityHost: specifiedCloud.ActiveDirectoryAuthorityHost,
+				})
 			}
 		}
 	}

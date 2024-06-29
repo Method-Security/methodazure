@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Method-Security/methodazure/internal/config"
 	"github.com/Method-Security/pkg/signal"
@@ -70,6 +71,21 @@ func (a *MethodAzure) InitRootCommand() {
 			}
 			a.AzureConfig.TenantID = tenantID
 
+			cloudName, err := cmd.Flags().GetString("cloud-config")
+			if err != nil {
+				return err
+			}
+			switch cloudName {
+			case "AzurePublic":
+				a.AzureConfig.CloudConfig = cloud.AzurePublic
+			case "AzureGovernment":
+				a.AzureConfig.CloudConfig = cloud.AzureGovernment
+			case "AzureChina":
+				a.AzureConfig.CloudConfig = cloud.AzureChina
+			default:
+				return errors.New("Invalid cloud name provided")
+			}
+
 			cred, err := azidentity.NewDefaultAzureCredential(nil)
 			if err != nil {
 				return err
@@ -104,6 +120,7 @@ func (a *MethodAzure) InitRootCommand() {
 		},
 	}
 
+	a.RootCmd.PersistentFlags().StringP("cloud-config", "c", "AzurePublic", "Azure Cloud to use (AzurePublic, AzureGovernment, AzureChina)")
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Quiet, "quiet", "q", false, "Suppress output")
 	a.RootCmd.PersistentFlags().BoolVarP(&a.RootFlags.Verbose, "verbose", "v", false, "Verbose output")
 	a.RootCmd.PersistentFlags().StringVarP(&outputFile, "output-file", "f", "", "Path to output file. If blank, will output to STDOUT")

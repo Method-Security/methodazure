@@ -4,9 +4,10 @@ package vm
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	"github.com/Method-Security/methodazure/internal/azure"
@@ -74,8 +75,7 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 	// Create VNet and subnet lookups
 	vnetReport, err := vnet.EnumerateVNets(ctx, cfg)
 	if err != nil {
-		log.Fatalf("failed to enumerate VNets: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to enumerate vnets: %v", err)
 	}
 
 	vnetLookup := make(map[string]string)
@@ -88,10 +88,14 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 	}
 
 	// Create a new client to interact with the compute resource provider
-	clientFactory, err := armcompute.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armcompute.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
-		log.Fatalf("failed to create client factory: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to create VM client factory: %v", err)
 	}
 
 	// List standalone VMs
@@ -99,8 +103,7 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, vm := range page.Value {
 			vmDetails := VirtualMachine{
@@ -135,8 +138,7 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 	for vmssPager.More() {
 		page, err := vmssPager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, vmss := range page.Value {
 			resourceGroup := azure.GetResourceGroupFromID(*vmss.ID)
@@ -144,8 +146,7 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 			for vmssInstancePager.More() {
 				instancePage, err := vmssInstancePager.NextPage(ctx)
 				if err != nil {
-					log.Fatalf("failed to advance page: %v", err)
-					errors = append(errors, err.Error())
+					return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 				}
 				for _, vm := range instancePage.Value {
 					vmDetails := VirtualMachineScaleSetVM{
@@ -196,7 +197,12 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 // Given a Network Profile, VNet Name -> ID map, this function returns a VNet ID and a list of Network Interfaces
 // VMs and VMSS VMs have different interfaces and hence the need to switch
 func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, networkProfile *armcompute.NetworkProfile, vnetLookup map[string]string, vmType string) (string, []NetworkInterface, error) {
-	networkClientFactory, err := armnetwork.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	networkClientFactory, err := armnetwork.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to create network client factory: %v", err)
 	}

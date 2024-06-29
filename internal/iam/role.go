@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2"
 	"github.com/Method-Security/methodazure/internal/config"
 )
@@ -13,7 +15,12 @@ func listRoles(ctx context.Context, cfg config.AzureConfig) ([]RoleDetails, erro
 	roles := []RoleDetails{}
 
 	// Create a new client to interact with the Authorization resource provider
-	clientFactory, err := armauthorization.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armauthorization.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return roles, fmt.Errorf("failed to create role definitions client: %v", err)
 	}

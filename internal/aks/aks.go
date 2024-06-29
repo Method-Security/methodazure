@@ -7,6 +7,8 @@ import (
 	"log"
 	"strings"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v2"
 	"github.com/Method-Security/methodazure/internal/azure"
@@ -49,10 +51,14 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 	errors := []string{}
 
 	// Create a new client to interact with the container service resource provider
-	clientFactory, err := armcontainerservice.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armcontainerservice.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
-		log.Fatalf("failed to create client factory: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to create AKS client factory: %v", err)
 	}
 
 	// Create a pager to list all AKS clusters in the subscription
@@ -62,8 +68,7 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, cluster := range page.Value {
 			resourceGroup := azure.GetResourceGroupFromID(*cluster.ID)
@@ -75,7 +80,7 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 			clusterDetails.ResourceGroupID = azure.GetResourceGroupIDFromName(cfg.SubID, clusterDetails.ResourceGroup)
 
 			// List node pools in the cluster
-			nodePools, err := listNodePools(ctx, cfg, resourceGroup, *cluster.Name, *cluster.Properties.NodeResourceGroup)
+			nodePools, err := listNodePools(ctx, cfg, *clientFactory, resourceGroup, *cluster.Name, *cluster.Properties.NodeResourceGroup)
 			if err != nil {
 				log.Printf("failed to list node pools for AKS cluster %s: %v", *cluster.Name, err)
 				errors = append(errors, err.Error())
@@ -100,13 +105,8 @@ func EnumerateAKSClusters(ctx context.Context, cfg config.AzureConfig) (*AzureRe
 	return &report, nil
 }
 
-func listNodePools(ctx context.Context, cfg config.AzureConfig, resourceGroup string, clusterName string, nodeResourceGroup string) ([]NodePoolDetails, error) {
+func listNodePools(ctx context.Context, cfg config.AzureConfig, clientFactory armcontainerservice.ClientFactory, resourceGroup string, clusterName string, nodeResourceGroup string) ([]NodePoolDetails, error) {
 	var nodePools []NodePoolDetails
-
-	clientFactory, err := armcontainerservice.NewClientFactory(cfg.SubID, cfg.Cred, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create container service client factory: %v", err)
-	}
 
 	// List node pools in the AKS cluster
 	pager := clientFactory.NewAgentPoolsClient().NewListPager(resourceGroup, clusterName, nil)
@@ -136,7 +136,12 @@ func listNodePools(ctx context.Context, cfg config.AzureConfig, resourceGroup st
 func listVMIDsInNodePool(ctx context.Context, cfg config.AzureConfig, nodeResourceGroup string, nodePoolName string) ([]string, error) {
 	var vmIDs []string
 
-	clientFactory, err := armcompute.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armcompute.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create compute client factory: %v", err)
 	}

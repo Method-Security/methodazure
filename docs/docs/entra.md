@@ -24,12 +24,13 @@ Usage:
   methodazure entra enumerate [flags]
 
 Flags:
-  -g, --graph-service-endpoint string   Microsoft Graph Service Endpoint (default "https://graph.microsoft.com/.default")
+  -g, --graph-service-endpoint string   Scope of Microsoft Graph Service Endpoint (e.g. https://graph.microsoft.com/.default), this is automatically defaulted based on --cloud-config value
   -h, --help                            help for enumerate
 
 Global Flags:
-  -o, --output string        Output format (signal, json, yaml). Default value is signal (default "signal")
-  -f, --output-file string   Path to output file. If blank, will output to STDOUT
-  -q, --quiet                Suppress output
-  -v, --verbose              Verbose output
+  -c, --cloud-config string   Azure Cloud to use (AzurePublic, AzureGovernment, AzureChina) (default "AzurePublic")
+  -o, --output string         Output format (signal, json, yaml). Default value is signal (default "signal")
+  -f, --output-file string    Path to output file. If blank, will output to STDOUT
+  -q, --quiet                 Suppress output
+  -v, --verbose               Verbose output
 ```
