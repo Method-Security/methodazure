@@ -24,6 +24,7 @@ type Details struct {
 // AzureResources contains details about all VNets in the subscription.
 type AzureResources struct {
 	SubscriptionID  string    `json:"subscription_id" yaml:"subscription_id"`
+	TenantID        string    `json:"tenant_id" yaml:"tenant_id"`
 	VirtualNetworks []Details `json:"virtual_networks" yaml:"virtual_networks"`
 }
 
@@ -74,6 +75,7 @@ func EnumerateVNets(ctx context.Context, cfg config.AzureConfig) (*AzureResource
 		resources.VirtualNetworks = virtualNetworks
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,
