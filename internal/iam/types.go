@@ -21,6 +21,7 @@ type RoleAssignmentDetails struct {
 // AzureResources contains details about all IAM related resources in the subscription.
 type AzureResources struct {
 	SubscriptionID  string                  `json:"subscription_id" yaml:"subscription_id"`
+	TenantID        string                  `json:"tenant_id" yaml:"tenant_id"`
 	Roles           []RoleDetails           `json:"roles" yaml:"roles"`
 	RoleAssignments []RoleAssignmentDetails `json:"role_assignments" yaml:"role_assignments"`
 }

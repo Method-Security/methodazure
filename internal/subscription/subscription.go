@@ -20,6 +20,7 @@ type Details struct {
 // AzureResources contains details about all Subscriptions.
 type AzureResources struct {
 	Subscriptions []Details `json:"subscriptions" yaml:"subscriptions"`
+	TenantID      string    `json:"tenant_id" yaml:"tenant_id"`
 }
 
 // AzureResourceReport contains the AzureResources and any non-fatal errors encountered during enumeration.
@@ -66,6 +67,7 @@ func EnumerateSubscriptions(ctx context.Context, cfg config.AzureConfig, specifi
 	}
 
 	resources.Subscriptions = subscriptions
+	resources.TenantID = cfg.TenantID
 	report := AzureResourceReport{
 		Resources: resources,
 		Errors:    errors,

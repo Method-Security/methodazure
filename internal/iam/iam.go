@@ -29,6 +29,8 @@ func EnumerateIAMResources(ctx context.Context, cfg config.AzureConfig) (*AzureR
 		resources.RoleAssignments = roleAssignments
 	}
 
+	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 	report := AzureResourceReport{
 		Resources: resources,
 		Errors:    errors,
