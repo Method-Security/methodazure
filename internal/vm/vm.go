@@ -54,6 +54,7 @@ type VirtualMachineScaleSetVM struct {
 // AzureResources contains details about all VM related resources in the subscription.
 type AzureResources struct {
 	SubscriptionID        string                     `json:"subscription_id" yaml:"subscription_id"`
+	TenantID              string                     `json:"tenant_id" yaml:"tenant_id"`
 	StandaloneVMInstances []VirtualMachine           `json:"standalone_vms" yaml:"standalone_vms"`
 	VMSSVMInstances       []VirtualMachineScaleSetVM `json:"vmss_vms" yaml:"vmss_vms"`
 }
@@ -186,6 +187,7 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 		resources.VMSSVMInstances = vmssVMs
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 	report := AzureResourceReport{
 		Resources: resources,
 		Errors:    errors,
