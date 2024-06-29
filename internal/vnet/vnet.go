@@ -3,8 +3,10 @@ package vnet
 
 import (
 	"context"
-	"log"
+	"fmt"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	"github.com/Method-Security/methodazure/internal/azure"
 	"github.com/Method-Security/methodazure/internal/config"
@@ -37,10 +39,14 @@ func EnumerateVNets(ctx context.Context, cfg config.AzureConfig) (*AzureResource
 	var virtualNetworks []Details
 	errors := []string{}
 
-	clientFactory, err := armnetwork.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armnetwork.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
-		log.Fatalf("failed to create network client factory: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to create network client factory: %v", err)
 	}
 
 	// Create a pager to list all VNets in the subscription
@@ -48,8 +54,7 @@ func EnumerateVNets(ctx context.Context, cfg config.AzureConfig) (*AzureResource
 	for vnetPager.More() {
 		page, err := vnetPager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, vnet := range page.Value {
 			resourceGroup := azure.GetResourceGroupFromID(*vnet.ID)

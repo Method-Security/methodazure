@@ -30,26 +30,7 @@ func (a *MethodAzure) InitSubscriptionCommand() {
 			if tryAllClouds == true {
 				clouds = []cloud.Configuration{cloud.AzurePublic, cloud.AzureGovernment, cloud.AzureChina}
 			} else {
-				cloudName, err := cmd.Flags().GetString("cloud")
-				if err != nil {
-					errorMessage := err.Error()
-					a.OutputSignal.ErrorMessage = &errorMessage
-					a.OutputSignal.Status = 1
-					return
-				}
-				switch cloudName {
-				case "AzurePublic":
-					clouds = []cloud.Configuration{cloud.AzurePublic}
-				case "AzureGovernment":
-					clouds = []cloud.Configuration{cloud.AzureGovernment}
-				case "AzureChina":
-					clouds = []cloud.Configuration{cloud.AzureChina}
-				default:
-					errorMessage := "Invalid cloud name provided"
-					a.OutputSignal.ErrorMessage = &errorMessage
-					a.OutputSignal.Status = 1
-					return
-				}
+				clouds = []cloud.Configuration{a.AzureConfig.CloudConfig}
 			}
 
 			report, err := subscription.EnumerateSubscriptions(cmd.Context(), a.AzureConfig, clouds)
@@ -61,8 +42,7 @@ func (a *MethodAzure) InitSubscriptionCommand() {
 			a.OutputSignal.Content = report
 		},
 	}
-	enumerateCmd.PersistentFlags().BoolP("try-all-clouds", "t", false, "Attempt to list subscriptions in AzurePublic, Azure Government, and AzureChina; if true overrides cloud flag")
-	enumerateCmd.PersistentFlags().StringP("cloud", "c", "AzurePublic", "Azure Cloud to use (AzurePublic, AzureGovernment, AzureChina)")
+	enumerateCmd.PersistentFlags().BoolP("try-all-clouds", "t", false, "Attempt to list subscriptions in AzurePublic, Azure Government, and AzureChina; if true overrides cloud-config flag")
 
 	subscriptionCmd.AddCommand(enumerateCmd)
 	a.RootCmd.AddCommand(subscriptionCmd)

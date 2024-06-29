@@ -3,8 +3,10 @@ package resourcegroup
 
 import (
 	"context"
-	"log"
+	"fmt"
 
+	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/Method-Security/methodazure/internal/config"
 )
@@ -19,6 +21,7 @@ type Details struct {
 // AzureResources contains details about all Resource Groups in the subscription.
 type AzureResources struct {
 	SubscriptionID string    `json:"subscription_id" yaml:"subscription_id"`
+	TenantID       string    `json:"tenant_id" yaml:"tenant_id"`
 	ResourceGroups []Details `json:"resource_groups" yaml:"resource_groups"`
 }
 
@@ -35,10 +38,14 @@ func EnumerateResourceGroups(ctx context.Context, cfg config.AzureConfig) (*Azur
 	var resourceGroups []Details
 	errors := []string{}
 
-	clientFactory, err := armresources.NewClientFactory(cfg.SubID, cfg.Cred, nil)
+	clientOptions := &armpolicy.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Cloud: cfg.CloudConfig,
+		},
+	}
+	clientFactory, err := armresources.NewClientFactory(cfg.SubID, cfg.Cred, clientOptions)
 	if err != nil {
-		log.Fatalf("failed to create resources client factory: %v", err)
-		errors = append(errors, err.Error())
+		return &AzureResourceReport{}, fmt.Errorf("failed to create resources group client factory: %v", err)
 	}
 
 	// Create a pager to list all Resource Groups in the subscription
@@ -46,8 +53,7 @@ func EnumerateResourceGroups(ctx context.Context, cfg config.AzureConfig) (*Azur
 	for rgPager.More() {
 		page, err := rgPager.NextPage(ctx)
 		if err != nil {
-			log.Fatalf("failed to advance page: %v", err)
-			errors = append(errors, err.Error())
+			return &AzureResourceReport{}, fmt.Errorf("failed to list pager: %v", err)
 		}
 		for _, rg := range page.Value {
 			rgDetails := Details{
@@ -64,6 +70,7 @@ func EnumerateResourceGroups(ctx context.Context, cfg config.AzureConfig) (*Azur
 		resources.ResourceGroups = resourceGroups
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,
