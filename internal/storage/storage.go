@@ -25,6 +25,7 @@ type Details struct {
 // AzureResources contains details about all Storage Accounts in the subscription.
 type AzureResources struct {
 	SubscriptionID  string    `json:"subscription_id" yaml:"subscription_id"`
+	TenantID       	string    `json:"tenant_id" yaml:"tenant_id"`
 	StorageAccounts []Details `json:"storage_accounts" yaml:"storage_accounts"`
 }
 
@@ -102,6 +103,7 @@ func EnumerateStorageAccounts(ctx context.Context, cfg config.AzureConfig) (*Azu
 		resources.StorageAccounts = storageAccounts
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,

@@ -32,6 +32,7 @@ type TrafficManagerProfileDetails struct {
 // AzureResources contains details about all DNS related resources in the subscription.
 type AzureResources struct {
 	SubscriptionID         string                         `json:"subscription_id" yaml:"subscription_id"`
+	TenantID               string                         `json:"tenant_id" yaml:"tenant_id"`
 	DNSZones               []ZoneDetails                  `json:"dns_zones" yaml:"dns_zones"`
 	TrafficManagerProfiles []TrafficManagerProfileDetails `json:"traffic_manager_profiles" yaml:"traffic_manager_profiles"`
 }
@@ -66,6 +67,7 @@ func EnumerateDNSResources(ctx context.Context, cfg config.AzureConfig) (*AzureR
 
 	// Prepare report
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,

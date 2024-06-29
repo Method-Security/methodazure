@@ -19,6 +19,7 @@ type Details struct {
 // AzureResources contains details about all Resource Groups in the subscription.
 type AzureResources struct {
 	SubscriptionID string    `json:"subscription_id" yaml:"subscription_id"`
+	TenantID       string    `json:"tenant_id" yaml:"tenant_id"`
 	ResourceGroups []Details `json:"resource_groups" yaml:"resource_groups"`
 }
 
@@ -64,6 +65,7 @@ func EnumerateResourceGroups(ctx context.Context, cfg config.AzureConfig) (*Azur
 		resources.ResourceGroups = resourceGroups
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,

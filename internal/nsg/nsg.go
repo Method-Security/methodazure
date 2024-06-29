@@ -22,6 +22,7 @@ type Details struct {
 // AzureResources contains details about all NSGs in the subscription.
 type AzureResources struct {
 	SubscriptionID        string    `json:"subscription_id" yaml:"subscription_id"`
+	TenantID              string    `json:"tenant_id" yaml:"tenant_id"`
 	NetworkSecurityGroups []Details `json:"network_security_groups" yaml:"network_security_groups"`
 }
 
@@ -68,6 +69,7 @@ func EnumerateNSGs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceR
 		resources.NetworkSecurityGroups = networkSecurityGroups
 	}
 	resources.SubscriptionID = cfg.SubID
+	resources.TenantID = cfg.TenantID
 
 	report := AzureResourceReport{
 		Resources: resources,
