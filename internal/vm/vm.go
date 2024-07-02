@@ -82,15 +82,18 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 	vnetLookup := make(map[string]string)
 	subnetLookup := make(map[string]string)
 	for _, v := range vnetReport.Resources.VirtualNetworks {
-		if v.Details.ID != nil {
-			vnetLookup[v.VNetName] = *v.Details.ID
-			if v.Details.Properties != nil && v.Details.Properties.Subnets != nil {
-				for _, s := range v.Details.Properties.Subnets {
-					if s.ID != nil && s.Properties != nil && s.Properties.AddressPrefix != nil {
-						subnetLookup[*s.ID] = *s.Properties.AddressPrefix
-					}
-				}
+		if v.Details.ID == nil {
+			continue
+		}
+		vnetLookup[v.VNetName] = *v.Details.ID
+		if v.Details.Properties != nil && v.Details.Properties.Subnets != nil {
+			continue
+		}
+		for _, s := range v.Details.Properties.Subnets {
+			if s.ID != nil && s.Properties != nil && s.Properties.AddressPrefix != nil {
+				continue
 			}
+			subnetLookup[*s.ID] = *s.Properties.AddressPrefix
 		}
 	}
 
