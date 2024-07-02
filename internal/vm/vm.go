@@ -23,9 +23,10 @@ type IPFqdnMapping struct {
 
 // NetworkInterface contains details about a single network interface and its corresponding IP addresses and FQDNs.
 type NetworkInterface struct {
-	ID      string               `json:"id" yaml:"id"`
-	Details armnetwork.Interface `json:"details" yaml:"details"`
-	IPFqdns []IPFqdnMapping      `json:"ip_fqdn" yaml:"ip_fqdn"`
+	ID      	string               	`json:"id" yaml:"id"`
+	Details 	armnetwork.Interface 	`json:"details" yaml:"details"`
+	IPFqdns 	[]IPFqdnMapping      	`json:"ip_fqdn" yaml:"ip_fqdn"`
+	Errors    	[]string       			`json:"errors" yaml:"errors"`
 }
 
 // SubnetDetails contains details about a single subnet.
@@ -226,6 +227,7 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 	for idx, nic := range networkProfile.NetworkInterfaces {
 		nicID := *nic.ID
 		var nicInterface armnetwork.Interface
+		errors := []string{}
 
 		switch vmType {
 		case "vm":
@@ -263,9 +265,13 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 		ipFqdnMappings := []IPFqdnMapping{}
 		for _, ipConfig := range nicInterface.Properties.IPConfigurations {
 			if ipConfig.Properties != nil && ipConfig.Properties.PublicIPAddress != nil {
+				fmt.Print("Attempting to enrich ublic IP ID: " + *ipConfig.Properties.PublicIPAddress.ID + "\n")
 				publicIPID := *ipConfig.Properties.PublicIPAddress.ID
 				publicIPResp, err := publicIPClient.Get(ctx, azure.GetResourceGroupFromID(publicIPID), azure.GetResourceNameFromID(publicIPID), nil)
-				if err == nil && publicIPResp.Properties != nil && publicIPResp.Properties.DNSSettings != nil {
+				if err != nil {
+					errors = append(errors, err.Error())
+				}
+				if publicIPResp.Properties != nil && publicIPResp.Properties.DNSSettings != nil {
 					ipFqdnMappings = append(ipFqdnMappings, IPFqdnMapping{
 						IP:   *publicIPResp.Properties.IPAddress,
 						FQDN: *publicIPResp.Properties.DNSSettings.Fqdn,
@@ -274,6 +280,7 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 			}
 		}
 		networkInterface.IPFqdns = ipFqdnMappings
+		networkInterface.Errors = errors
 		networkInterfaces = append(networkInterfaces, networkInterface)
 
 		// Extract the vnetID only from the first NIC
