@@ -265,7 +265,7 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 		ipFqdnMappings := []IPFqdnMapping{}
 		for _, ipConfig := range nicInterface.Properties.IPConfigurations {
 			if ipConfig.Properties != nil && ipConfig.Properties.PublicIPAddress != nil {
-				fmt.Print("Attempting to enrich ublic IP ID: " + *ipConfig.Properties.PublicIPAddress.ID + "\n")
+				fmt.Print("Attempting to enrich public IP ID: " + *ipConfig.Properties.PublicIPAddress.ID + "\n")
 				publicIPID := *ipConfig.Properties.PublicIPAddress.ID
 				publicIPResp, err := publicIPClient.Get(ctx, azure.GetResourceGroupFromID(publicIPID), azure.GetResourceNameFromID(publicIPID), nil)
 				if err != nil {
