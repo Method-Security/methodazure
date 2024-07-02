@@ -220,6 +220,10 @@ func listPostgresFlexibleInstances(ctx context.Context, cfg config.AzureConfig) 
 			postgresInstanceDetails.ResourceGroupID = azure.GetResourceGroupIDFromName(cfg.SubID, postgresInstanceDetails.ResourceGroup)
 
 			// Get VNet ID
+			if postgresInstance.Properties.Network == nil || postgresInstance.Properties.Network.DelegatedSubnetResourceID == nil {
+				log.Printf("no VNet ID found for PostgreSQL Flexible instance %s", *postgresInstance.Name)
+				continue
+			}
 			vNetName := azure.GetVNetNameFromID(*postgresInstance.Properties.Network.DelegatedSubnetResourceID)
 			vNetID, err := azure.GetVNetIDFromVNetName(ctx, cfg, postgresInstanceDetails.ResourceGroup, vNetName)
 			if err != nil {

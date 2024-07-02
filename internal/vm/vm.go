@@ -271,11 +271,15 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 				if err != nil {
 					errors = append(errors, err.Error())
 				}
-				if publicIPResp.Properties != nil && publicIPResp.Properties.DNSSettings != nil {
-					ipFqdnMappings = append(ipFqdnMappings, IPFqdnMapping{
+				if publicIPResp.Properties != nil {
+					ipFqdnMapping := IPFqdnMapping{
 						IP:   *publicIPResp.Properties.IPAddress,
-						FQDN: *publicIPResp.Properties.DNSSettings.Fqdn,
-					})
+					}
+					// Some public IPs may not have DNS configured
+					if publicIPResp.Properties.DNSSettings != nil {
+						ipFqdnMapping.FQDN = *publicIPResp.Properties.DNSSettings.Fqdn
+					}
+					ipFqdnMappings = append(ipFqdnMappings,ipFqdnMapping)
 				}
 			}
 		}
