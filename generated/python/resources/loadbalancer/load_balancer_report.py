@@ -11,7 +11,7 @@ from .load_balancer import LoadBalancer
 class LoadBalancerReport(pydantic_v1.BaseModel):
     subscription_id: str = pydantic_v1.Field(alias="subscriptionId")
     tenant_id: str = pydantic_v1.Field(alias="tenantId")
-    load_balancers: typing.Optional[typing.List[LoadBalancer]] = pydantic_v1.Field(alias="loadBalancers", default=None)
+    load_balancers: typing.List[LoadBalancer] = pydantic_v1.Field(alias="loadBalancers")
     errors: typing.Optional[typing.List[str]] = None
 
     def json(self, **kwargs: typing.Any) -> str:

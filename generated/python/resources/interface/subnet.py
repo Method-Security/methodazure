@@ -10,7 +10,7 @@ from ...core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 class Subnet(pydantic_v1.BaseModel):
     id: str
     name: str
-    type: str
+    type: typing.Optional[str] = None
     address_prefix: typing.Optional[str] = pydantic_v1.Field(alias="addressPrefix", default=None)
     address_prefixes: typing.Optional[typing.List[str]] = pydantic_v1.Field(alias="addressPrefixes", default=None)
 

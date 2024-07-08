@@ -8,6 +8,7 @@ from .load_balancer_report import LoadBalancerReport
 from .load_balancer_sku import LoadBalancerSku
 from .load_balancer_sku_name import LoadBalancerSkuName
 from .load_balancer_sku_tier import LoadBalancerSkuTier
+from .load_balancing_rule import LoadBalancingRule
 from .nat_rule_port_mapping import NatRulePortMapping
 from .sub_resource import SubResource
 from .sync_mode import SyncMode
@@ -21,6 +22,7 @@ __all__ = [
     "LoadBalancerSku",
     "LoadBalancerSkuName",
     "LoadBalancerSkuTier",
+    "LoadBalancingRule",
     "NatRulePortMapping",
     "SubResource",
     "SyncMode",

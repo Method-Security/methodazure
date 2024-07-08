@@ -12,7 +12,7 @@ class PublicIpAddress(pydantic_v1.BaseModel):
     id: str
     location: str
     ip_address: str = pydantic_v1.Field(alias="ipAddress")
-    dns_settings: PublicIpAddressDnsSettings = pydantic_v1.Field(alias="dnsSettings")
+    dns_settings: typing.Optional[PublicIpAddressDnsSettings] = pydantic_v1.Field(alias="dnsSettings", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -1,11 +1,16 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
 types:
+  TransportProtocol:
+    enum:
+      - Tcp
+      - Udp
+      - All
   Subnet:
     properties:
       id: string
       name: string
-      type: string
+      type: optional<string>
       addressPrefix: optional<string>
       addressPrefixes: optional<list<string>>
   PublicIPAddressDNSSettings:
@@ -18,12 +23,12 @@ types:
       id: string
       location: string
       ipAddress: string
-      dnsSettings: PublicIPAddressDNSSettings
+      dnsSettings: optional<PublicIPAddressDNSSettings>
   InterfaceIpConfiguration:
     properties:
       id: string
       name: string
-      type: string
-      privateIpAddress: string
-      publicIpAddress: PublicIpAddress
-      subnet: Subnet
+      type: optional<string>
+      privateIpAddress: optional<string>
+      publicIpAddress: optional<PublicIpAddress>
+      subnet: optional<Subnet>

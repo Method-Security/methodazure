@@ -5,32 +5,27 @@ import typing
 
 from ...core.datetime_utils import serialize_datetime
 from ...core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
-from ..interface.interface_ip_configuration import InterfaceIpConfiguration
-from .backend_address_pool import BackendAddressPool
-from .load_balancer_sku import LoadBalancerSku
-from .load_balancing_rule import LoadBalancingRule
+from ..interface.transport_protocol import TransportProtocol
+from .sub_resource import SubResource
 
 
-class LoadBalancer(pydantic_v1.BaseModel):
+class LoadBalancingRule(pydantic_v1.BaseModel):
     """
-    LoadBalancer represents an Azure Load Balancer as defined in the Azure Go SDK:
-    https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancer
+    LoadBalancingRule represents an Azure Load Balancing Rule as defined in the Azure Go SDK:
+    https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancingRule
     """
 
     id: str
     name: str
-    location: str
-    resource_group: str = pydantic_v1.Field(alias="resourceGroup")
-    resource_group_id: str = pydantic_v1.Field(alias="resourceGroupId")
-    sku: LoadBalancerSku
-    backend_address_pools: typing.Optional[typing.List[BackendAddressPool]] = pydantic_v1.Field(
+    frontend_port: int = pydantic_v1.Field(alias="frontendPort")
+    protocol: TransportProtocol
+    backend_address_pool: typing.Optional[SubResource] = pydantic_v1.Field(alias="backendAddressPool", default=None)
+    backend_address_pools: typing.Optional[typing.List[SubResource]] = pydantic_v1.Field(
         alias="backendAddressPools", default=None
     )
-    frontend_ip_configurations: typing.Optional[typing.List[InterfaceIpConfiguration]] = pydantic_v1.Field(
-        alias="frontendIPConfigurations", default=None
-    )
-    load_balancing_rules: typing.Optional[typing.List[LoadBalancingRule]] = pydantic_v1.Field(
-        alias="loadBalancingRules", default=None
+    backend_port: int = pydantic_v1.Field(alias="backendPort")
+    frontend_ip_configuration: typing.Optional[SubResource] = pydantic_v1.Field(
+        alias="frontendIPConfiguration", default=None
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -12,10 +12,10 @@ from .subnet import Subnet
 class InterfaceIpConfiguration(pydantic_v1.BaseModel):
     id: str
     name: str
-    type: str
-    private_ip_address: str = pydantic_v1.Field(alias="privateIpAddress")
-    public_ip_address: PublicIpAddress = pydantic_v1.Field(alias="publicIpAddress")
-    subnet: Subnet
+    type: typing.Optional[str] = None
+    private_ip_address: typing.Optional[str] = pydantic_v1.Field(alias="privateIpAddress", default=None)
+    public_ip_address: typing.Optional[PublicIpAddress] = pydantic_v1.Field(alias="publicIpAddress", default=None)
+    subnet: typing.Optional[Subnet] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

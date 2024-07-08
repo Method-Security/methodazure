@@ -12,17 +12,21 @@ from .sub_resource import SubResource
 
 class LoadBalancerBackendAddress(pydantic_v1.BaseModel):
     name: str
-    admin_state: LoadBalancerBackendAddressAdminState = pydantic_v1.Field(alias="adminState")
-    ip_address: str = pydantic_v1.Field(alias="ipAddress")
-    load_balancer_frontend_ip_configuration: SubResource = pydantic_v1.Field(
-        alias="loadBalancerFrontendIPConfiguration"
+    admin_state: typing.Optional[LoadBalancerBackendAddressAdminState] = pydantic_v1.Field(
+        alias="adminState", default=None
     )
-    subnet: SubResource
-    virtual_network: SubResource = pydantic_v1.Field(alias="virtualNetwork")
-    inbound_nat_rules_port_mapping: typing.List[NatRulePortMapping] = pydantic_v1.Field(
-        alias="inboundNatRulesPortMapping"
+    ip_address: typing.Optional[str] = pydantic_v1.Field(alias="ipAddress", default=None)
+    load_balancer_frontend_ip_configuration: typing.Optional[SubResource] = pydantic_v1.Field(
+        alias="loadBalancerFrontendIPConfiguration", default=None
     )
-    network_interface_ip_configurations: SubResource = pydantic_v1.Field(alias="NetworkInterfaceIpConfigurations")
+    subnet: typing.Optional[SubResource] = None
+    virtual_network: typing.Optional[SubResource] = pydantic_v1.Field(alias="virtualNetwork", default=None)
+    inbound_nat_rules_port_mapping: typing.Optional[typing.List[NatRulePortMapping]] = pydantic_v1.Field(
+        alias="inboundNatRulesPortMapping", default=None
+    )
+    network_interface_ip_configurations: typing.Optional[SubResource] = pydantic_v1.Field(
+        alias="NetworkInterfaceIpConfigurations", default=None
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

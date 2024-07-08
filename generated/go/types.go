@@ -11,8 +11,8 @@ import (
 type InterfaceIpConfiguration struct {
 	Id               string           `json:"id" url:"id"`
 	Name             string           `json:"name" url:"name"`
-	Type             string           `json:"type" url:"type"`
-	PrivateIpAddress string           `json:"privateIpAddress" url:"privateIpAddress"`
+	Type             *string          `json:"type,omitempty" url:"type,omitempty"`
+	PrivateIpAddress *string          `json:"privateIpAddress,omitempty" url:"privateIpAddress,omitempty"`
 	PublicIpAddress  *PublicIpAddress `json:"publicIpAddress,omitempty" url:"publicIpAddress,omitempty"`
 	Subnet           *Subnet          `json:"subnet,omitempty" url:"subnet,omitempty"`
 
@@ -144,7 +144,7 @@ func (p *PublicIpAddress) String() string {
 type Subnet struct {
 	Id              string   `json:"id" url:"id"`
 	Name            string   `json:"name" url:"name"`
-	Type            string   `json:"type" url:"type"`
+	Type            *string  `json:"type,omitempty" url:"type,omitempty"`
 	AddressPrefix   *string  `json:"addressPrefix,omitempty" url:"addressPrefix,omitempty"`
 	AddressPrefixes []string `json:"addressPrefixes,omitempty" url:"addressPrefixes,omitempty"`
 
@@ -186,6 +186,31 @@ func (s *Subnet) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
+type TransportProtocol string
+
+const (
+	TransportProtocolTcp TransportProtocol = "Tcp"
+	TransportProtocolUdp TransportProtocol = "Udp"
+	TransportProtocolAll TransportProtocol = "All"
+)
+
+func NewTransportProtocolFromString(s string) (TransportProtocol, error) {
+	switch s {
+	case "Tcp":
+		return TransportProtocolTcp, nil
+	case "Udp":
+		return TransportProtocolUdp, nil
+	case "All":
+		return TransportProtocolAll, nil
+	}
+	var t TransportProtocol
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TransportProtocol) Ptr() *TransportProtocol {
+	return &t
+}
+
 // Collection of backend address pools used by the load balancer:
 // https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#BackendAddressPool
 type BackendAddressPool struct {
@@ -193,8 +218,8 @@ type BackendAddressPool struct {
 	Name                         string                        `json:"name" url:"name"`
 	Type                         string                        `json:"type" url:"type"`
 	LoadBalancerBackendAddresses []*LoadBalancerBackendAddress `json:"loadBalancerBackendAddresses,omitempty" url:"loadBalancerBackendAddresses,omitempty"`
-	Location                     string                        `json:"location" url:"location"`
-	SyncMode                     SyncMode                      `json:"syncMode" url:"syncMode"`
+	Location                     *string                       `json:"location,omitempty" url:"location,omitempty"`
+	SyncMode                     *SyncMode                     `json:"syncMode,omitempty" url:"syncMode,omitempty"`
 	VirtualNetwork               *SubResource                  `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
 	BackendIpConfigurations      []*InterfaceIpConfiguration   `json:"backendIpConfigurations,omitempty" url:"backendIpConfigurations,omitempty"`
 
@@ -239,6 +264,7 @@ func (b *BackendAddressPool) String() string {
 // LoadBalancer represents an Azure Load Balancer as defined in the Azure Go SDK:
 // https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancer
 type LoadBalancer struct {
+	Id                       string                      `json:"id" url:"id"`
 	Name                     string                      `json:"name" url:"name"`
 	Location                 string                      `json:"location" url:"location"`
 	ResourceGroup            string                      `json:"resourceGroup" url:"resourceGroup"`
@@ -246,6 +272,7 @@ type LoadBalancer struct {
 	Sku                      *LoadBalancerSku            `json:"sku,omitempty" url:"sku,omitempty"`
 	BackendAddressPools      []*BackendAddressPool       `json:"backendAddressPools,omitempty" url:"backendAddressPools,omitempty"`
 	FrontendIpConfigurations []*InterfaceIpConfiguration `json:"frontendIPConfigurations,omitempty" url:"frontendIPConfigurations,omitempty"`
+	LoadBalancingRules       []*LoadBalancingRule        `json:"loadBalancingRules,omitempty" url:"loadBalancingRules,omitempty"`
 
 	extraProperties map[string]interface{}
 	_rawJSON        json.RawMessage
@@ -286,14 +313,14 @@ func (l *LoadBalancer) String() string {
 }
 
 type LoadBalancerBackendAddress struct {
-	Name                                string                               `json:"name" url:"name"`
-	AdminState                          LoadBalancerBackendAddressAdminState `json:"adminState" url:"adminState"`
-	IpAddress                           string                               `json:"ipAddress" url:"ipAddress"`
-	LoadBalancerFrontendIpConfiguration *SubResource                         `json:"loadBalancerFrontendIPConfiguration,omitempty" url:"loadBalancerFrontendIPConfiguration,omitempty"`
-	Subnet                              *SubResource                         `json:"subnet,omitempty" url:"subnet,omitempty"`
-	VirtualNetwork                      *SubResource                         `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
-	InboundNatRulesPortMapping          []*NatRulePortMapping                `json:"inboundNatRulesPortMapping,omitempty" url:"inboundNatRulesPortMapping,omitempty"`
-	NetworkInterfaceIpConfigurations    *SubResource                         `json:"NetworkInterfaceIpConfigurations,omitempty" url:"NetworkInterfaceIpConfigurations,omitempty"`
+	Name                                string                                `json:"name" url:"name"`
+	AdminState                          *LoadBalancerBackendAddressAdminState `json:"adminState,omitempty" url:"adminState,omitempty"`
+	IpAddress                           *string                               `json:"ipAddress,omitempty" url:"ipAddress,omitempty"`
+	LoadBalancerFrontendIpConfiguration *SubResource                          `json:"loadBalancerFrontendIPConfiguration,omitempty" url:"loadBalancerFrontendIPConfiguration,omitempty"`
+	Subnet                              *SubResource                          `json:"subnet,omitempty" url:"subnet,omitempty"`
+	VirtualNetwork                      *SubResource                          `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
+	InboundNatRulesPortMapping          []*NatRulePortMapping                 `json:"inboundNatRulesPortMapping,omitempty" url:"inboundNatRulesPortMapping,omitempty"`
+	NetworkInterfaceIpConfigurations    *SubResource                          `json:"NetworkInterfaceIpConfigurations,omitempty" url:"NetworkInterfaceIpConfigurations,omitempty"`
 
 	extraProperties map[string]interface{}
 	_rawJSON        json.RawMessage
@@ -486,6 +513,56 @@ func (l *LoadBalancerSku) UnmarshalJSON(data []byte) error {
 }
 
 func (l *LoadBalancerSku) String() string {
+	if len(l._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(l); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", l)
+}
+
+// LoadBalancingRule represents an Azure Load Balancing Rule as defined in the Azure Go SDK:
+// https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancingRule
+type LoadBalancingRule struct {
+	Id                      string            `json:"id" url:"id"`
+	Name                    string            `json:"name" url:"name"`
+	FrontendPort            int               `json:"frontendPort" url:"frontendPort"`
+	Protocol                TransportProtocol `json:"protocol" url:"protocol"`
+	BackendAddressPool      *SubResource      `json:"backendAddressPool,omitempty" url:"backendAddressPool,omitempty"`
+	BackendAddressPools     []*SubResource    `json:"backendAddressPools,omitempty" url:"backendAddressPools,omitempty"`
+	BackendPort             int               `json:"backendPort" url:"backendPort"`
+	FrontendIpConfiguration *SubResource      `json:"frontendIPConfiguration,omitempty" url:"frontendIPConfiguration,omitempty"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (l *LoadBalancingRule) GetExtraProperties() map[string]interface{} {
+	return l.extraProperties
+}
+
+func (l *LoadBalancingRule) UnmarshalJSON(data []byte) error {
+	type unmarshaler LoadBalancingRule
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*l = LoadBalancingRule(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *l)
+	if err != nil {
+		return err
+	}
+	l.extraProperties = extraProperties
+
+	l._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (l *LoadBalancingRule) String() string {
 	if len(l._rawJSON) > 0 {
 		if value, err := core.StringifyJSON(l._rawJSON); err == nil {
 			return value

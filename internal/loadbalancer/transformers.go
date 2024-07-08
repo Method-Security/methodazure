@@ -53,18 +53,25 @@ func convertBackendAddressPools(azurePools []*armnetwork.BackendAddressPool) []*
 			continue
 		}
 
-		syncMode, _ := methodazure.NewSyncModeFromString(azure.GetStringEnumPtrValue(azurePool.Properties.SyncMode))
-		customPool := &methodazure.BackendAddressPool{
+		// Id, Name, Type are always present, regardless of ability to get more details
+		// The other fields need enrichment of some kind which may not always work; the cnversion functions below return nil if no enrichment
+		pool := &methodazure.BackendAddressPool{
 			Id:                           azure.GetStringPtrValue(azurePool.ID),
 			Name:                         azure.GetStringPtrValue(azurePool.Name),
 			Type:                         azure.GetStringPtrValue(azurePool.Type),
 			LoadBalancerBackendAddresses: convertBackendAddresses(azurePool.Properties.LoadBalancerBackendAddresses),
-			Location:                     azure.GetStringPtrValue(azurePool.Properties.Location),
-			SyncMode:                     syncMode,
 			BackendIpConfigurations:      azuretransformers.ConvertInterfaceIPConfigurations(azurePool.Properties.BackendIPConfigurations),
 		}
+		syncMode, err := methodazure.NewSyncModeFromString(azure.GetStringEnumPtrValue(azurePool.Properties.SyncMode))
+		if err != nil && syncMode != ""{
+			pool.SyncMode = &syncMode
+		}
+		location := azure.GetStringPtrValue(azurePool.Properties.Location)
+		if location != "" {
+			pool.Location = &location
+		}
 
-		pools = append(pools, customPool)
+		pools = append(pools, pool)
 	}
 
 	return pools
@@ -78,15 +85,22 @@ func convertBackendAddresses(azureAddresses []*armnetwork.LoadBalancerBackendAdd
 			continue
 		}
 
-		adminState, _ := methodazure.NewLoadBalancerBackendAddressAdminStateFromString(azure.GetStringEnumPtrValue(azureAddress.Properties.AdminState))
+		// Name is the only guaranteed field
+		// The properties from conversions return nil if no enrichment is possible
 		address := &methodazure.LoadBalancerBackendAddress{
 			Name:                                azure.GetStringPtrValue(azureAddress.Name),
-			AdminState:                          adminState,
-			IpAddress:                           azure.GetStringPtrValue(azureAddress.Properties.IPAddress),
 			LoadBalancerFrontendIpConfiguration: convertSubResource(azureAddress.Properties.LoadBalancerFrontendIPConfiguration),
 			Subnet:                              convertSubResource(azureAddress.Properties.Subnet),
 			VirtualNetwork:                      convertSubResource(azureAddress.Properties.VirtualNetwork),
 			InboundNatRulesPortMapping:          convertNatRulePortMappings(azureAddress.Properties.InboundNatRulesPortMapping),
+		}
+		adminState, err := methodazure.NewLoadBalancerBackendAddressAdminStateFromString(azure.GetStringEnumPtrValue(azureAddress.Properties.AdminState))
+		if err != nil && adminState != "" {
+			address.AdminState = &adminState
+		}
+		ipAddress := azure.GetStringPtrValue(azureAddress.Properties.IPAddress)
+		if ipAddress != "" {
+			address.IpAddress = &ipAddress
 		}
 
 		addresses = append(addresses, address)
@@ -127,7 +141,7 @@ func convertFrontendIPConfigurations(azureConfigs []*armnetwork.FrontendIPConfig
 		config := &methodazure.InterfaceIpConfiguration{
 			Id:               azure.GetStringPtrValue(azureConfig.ID),
 			Name:             azure.GetStringPtrValue(azureConfig.Name),
-			PrivateIpAddress: azure.GetStringPtrValue(azureConfig.Properties.PrivateIPAddress),
+			PrivateIpAddress: azureConfig.Properties.PrivateIPAddress,
 			PublicIpAddress:  azuretransformers.ConvertPublicIPAddress(azureConfig.Properties.PublicIPAddress),
 			Subnet:           azuretransformers.ConvertSubnet(azureConfig.Properties.Subnet),
 		}
@@ -136,4 +150,39 @@ func convertFrontendIPConfigurations(azureConfigs []*armnetwork.FrontendIPConfig
 	}
 
 	return configs
+}
+
+// Load Balancer rule transformers
+func convertLoadBalancingRules(azureRules []*armnetwork.LoadBalancingRule) []*methodazure.LoadBalancingRule {
+	var rules []*methodazure.LoadBalancingRule
+
+	for _, azureRule := range azureRules {
+		if azureRule == nil {
+			continue
+		}
+
+		var backendAddressPools []*methodazure.SubResource
+		for _, pool := range azureRule.Properties.BackendAddressPools {
+			backendAddressPools = append(backendAddressPools, convertSubResource(pool))
+		}
+
+		rule := &methodazure.LoadBalancingRule{
+			Id:                 azure.GetStringPtrValue(azureRule.ID),
+			Name:               azure.GetStringPtrValue(azureRule.Name),
+			FrontendPort:       int(*azureRule.Properties.FrontendPort),
+			BackendAddressPool: convertSubResource(azureRule.Properties.BackendAddressPool),
+			BackendAddressPools: backendAddressPools,
+			BackendPort:        int(*azureRule.Properties.BackendPort),
+			FrontendIpConfiguration: convertSubResource(azureRule.Properties.FrontendIPConfiguration),
+		}
+		protocol, err := methodazure.NewTransportProtocolFromString(azure.GetStringEnumPtrValue(azureRule.Properties.Protocol))
+		if err != nil && protocol != "" {
+			rule.Protocol = protocol
+		}
+		
+
+		rules = append(rules, rule)
+	}
+
+	return rules
 }

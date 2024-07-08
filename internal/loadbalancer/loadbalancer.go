@@ -52,24 +52,30 @@ func EnumerateLoadBalancers(ctx context.Context, cfg config.AzureConfig) methoda
 		}
 		for _, lb := range page.Value {
 			loadBalancer := methodazure.LoadBalancer{
+				Id:            *lb.ID,
 				Name:          *lb.Name,
 				Location:      *lb.Location,
 				ResourceGroup: azure.GetResourceGroupFromID(*lb.ID),
 				Sku:           convertLoadBalancerSkuType(lb.SKU),
 			}
 			loadBalancer.ResourceGroupId = azure.GetResourceGroupIDFromName(cfg.SubID, loadBalancer.ResourceGroup)
+
 			// Backend address pools
 			enrichedBackendAddressPools, poolErrors := enrichBackendAddressPools(ctx, *clientFactory, lb.Properties.BackendAddressPools)
 			if len(poolErrors) > 0 {
 				errors = append(errors, poolErrors...)
 			}
 			loadBalancer.BackendAddressPools = convertBackendAddressPools(enrichedBackendAddressPools)
+			
 			// Frontend IP configurations
 			enrichedFrontendIPConfigs, frontendErrors := enrichFrontendIPConfigurations(ctx, *clientFactory, lb.Properties.FrontendIPConfigurations)
 			if len(frontendErrors) > 0 {
 				errors = append(errors, frontendErrors...)
 			}
 			loadBalancer.FrontendIpConfigurations = convertFrontendIPConfigurations(enrichedFrontendIPConfigs)
+
+			// Load Balancing Rules
+			loadBalancer.LoadBalancingRules = convertLoadBalancingRules(lb.Properties.LoadBalancingRules)
 
 			loadBalancers = append(loadBalancers, &loadBalancer)
 		}

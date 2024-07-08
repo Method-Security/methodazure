@@ -19,6 +19,7 @@ func ConvertSubnet(azureSubnet *armnetwork.Subnet) *methodazure.Subnet {
 	subnet := &methodazure.Subnet{
 		Id:              azure.GetStringPtrValue(azureSubnet.ID),
 		Name:            azure.GetStringPtrValue(azureSubnet.Name),
+		Type:			 azureSubnet.Type,
 		AddressPrefix:   azureSubnet.Properties.AddressPrefix,
 		AddressPrefixes: addressPrefixes,
 	}
@@ -63,7 +64,7 @@ func ConvertInterfaceIPConfigurations(azureIPConfigs []*armnetwork.InterfaceIPCo
 		ipConfig := &methodazure.InterfaceIpConfiguration{
 			Id:               azure.GetStringPtrValue(azureIPConfig.ID),
 			Name:             azure.GetStringPtrValue(azureIPConfig.Name),
-			PrivateIpAddress: azure.GetStringPtrValue(azureIPConfig.Properties.PrivateIPAddress),
+			PrivateIpAddress: azureIPConfig.Properties.PrivateIPAddress,
 			PublicIpAddress:  ConvertPublicIPAddress(azureIPConfig.Properties.PublicIPAddress),
 			Subnet:           ConvertSubnet(azureIPConfig.Properties.Subnet),
 		}
@@ -72,4 +73,12 @@ func ConvertInterfaceIPConfigurations(azureIPConfigs []*armnetwork.InterfaceIPCo
 	}
 
 	return ipConfigs
+}
+
+func ConvertTransportProtocol(azureProtocol *armnetwork.TransportProtocol) methodazure.TransportProtocol {
+	if azureProtocol == nil {
+		return methodazure.TransportProtocol("")
+	}
+
+	return methodazure.TransportProtocol(*azureProtocol)
 }

@@ -23,9 +23,9 @@ class BackendAddressPool(pydantic_v1.BaseModel):
     load_balancer_backend_addresses: typing.Optional[typing.List[LoadBalancerBackendAddress]] = pydantic_v1.Field(
         alias="loadBalancerBackendAddresses", default=None
     )
-    location: str
-    sync_mode: SyncMode = pydantic_v1.Field(alias="syncMode")
-    virtual_network: SubResource = pydantic_v1.Field(alias="virtualNetwork")
+    location: typing.Optional[str] = None
+    sync_mode: typing.Optional[SyncMode] = pydantic_v1.Field(alias="syncMode", default=None)
+    virtual_network: typing.Optional[SubResource] = pydantic_v1.Field(alias="virtualNetwork", default=None)
     backend_ip_configurations: typing.Optional[typing.List[InterfaceIpConfiguration]] = pydantic_v1.Field(
         alias="backendIpConfigurations", default=None
     )

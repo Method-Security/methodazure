@@ -38,13 +38,13 @@ types:
   LoadBalancerBackendAddress:
     properties:
       name: string
-      adminState: LoadBalancerBackendAddressAdminState
-      ipAddress: string
-      loadBalancerFrontendIPConfiguration: SubResource
-      subnet: SubResource
-      virtualNetwork: SubResource
-      inboundNatRulesPortMapping: list<NatRulePortMapping>
-      NetworkInterfaceIpConfigurations: SubResource
+      adminState: optional<LoadBalancerBackendAddressAdminState>
+      ipAddress: optional<string>
+      loadBalancerFrontendIPConfiguration: optional<SubResource>
+      subnet: optional<SubResource>
+      virtualNetwork: optional<SubResource>
+      inboundNatRulesPortMapping: optional<list<NatRulePortMapping>>
+      NetworkInterfaceIpConfigurations: optional<SubResource>
   BackendAddressPool:
     docs: |
       Collection of backend address pools used by the load balancer:
@@ -54,28 +54,42 @@ types:
       name: string
       type: string
       loadBalancerBackendAddresses: optional<list<LoadBalancerBackendAddress>>
-      location: string
-      syncMode: SyncMode
-      virtualNetwork: SubResource
+      location: optional<string>
+      syncMode: optional<SyncMode>
+      virtualNetwork: optional<SubResource>
       backendIpConfigurations: optional<list<interface.InterfaceIpConfiguration>>
+  LoadBalancingRule:
+    docs: |
+      LoadBalancingRule represents an Azure Load Balancing Rule as defined in the Azure Go SDK:
+      https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancingRule
+    properties:
+      id: string
+      name: string
+      frontendPort: integer
+      protocol: interface.TransportProtocol
+      backendAddressPool: optional<SubResource>
+      backendAddressPools: optional<list<SubResource>>
+      backendPort: integer
+      frontendIPConfiguration: optional<SubResource>
   LoadBalancer:
     docs: |
       LoadBalancer represents an Azure Load Balancer as defined in the Azure Go SDK:
       https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancer
     properties:
+      id: string
       name: string
       location: string
       resourceGroup: string
       resourceGroupId: string
       sku: LoadBalancerSku
-      backendAddressPools: list<BackendAddressPool>
-      frontendIPConfigurations: list<interface.InterfaceIpConfiguration>
+      backendAddressPools: optional<list<BackendAddressPool>>
+      frontendIPConfigurations: optional<list<interface.InterfaceIpConfiguration>>
       #inboundNatRules: list<InboundNatRule>
-      #loadBalancingRules: list<LoadBalancingRule>
+      loadBalancingRules: optional<list<LoadBalancingRule>>
       #outboundRules: list<OutboundRule>
   LoadBalancerReport:
     properties:
       subscriptionId: string
       tenantId: string
-      loadBalancers: optional<list<LoadBalancer>>
+      loadBalancers: list<LoadBalancer>
       errors: optional<list<string>>
