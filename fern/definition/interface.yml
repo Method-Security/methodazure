@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+types:
+  Subnet:
+    properties:
+      id: string
+      name: string
+      type: string
+      addressPrefix: optional<string>
+      addressPrefixes: optional<list<string>>
+  PublicIPAddressDNSSettings:
+    properties:
+      domainNameLabel: string
+      fqdn: string
+      reverseFqdn: string
+  PublicIpAddress:
+    properties:
+      id: string
+      location: string
+      ipAddress: string
+      dnsSettings: PublicIPAddressDNSSettings
+  InterfaceIpConfiguration:
+    properties:
+      id: string
+      name: string
+      type: string
+      privateIpAddress: string
+      publicIpAddress: PublicIpAddress
+      subnet: Subnet

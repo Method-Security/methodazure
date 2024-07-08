@@ -6,24 +6,28 @@ import typing
 from ...core.datetime_utils import serialize_datetime
 from ...core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..interface.interface_ip_configuration import InterfaceIpConfiguration
-from .backend_address_pool import BackendAddressPool
-from .load_balancer_sku import LoadBalancerSku
+from .load_balancer_backend_address import LoadBalancerBackendAddress
+from .sub_resource import SubResource
+from .sync_mode import SyncMode
 
 
-class LoadBalancer(pydantic_v1.BaseModel):
+class BackendAddressPool(pydantic_v1.BaseModel):
     """
-    LoadBalancer represents an Azure Load Balancer as defined in the Azure Go SDK:
-    https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancer
+    Collection of backend address pools used by the load balancer:
+    https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#BackendAddressPool
     """
 
+    id: str
     name: str
+    type: str
+    load_balancer_backend_addresses: typing.Optional[typing.List[LoadBalancerBackendAddress]] = pydantic_v1.Field(
+        alias="loadBalancerBackendAddresses", default=None
+    )
     location: str
-    resource_group: str = pydantic_v1.Field(alias="resourceGroup")
-    resource_group_id: str = pydantic_v1.Field(alias="resourceGroupId")
-    sku: LoadBalancerSku
-    backend_address_pools: typing.List[BackendAddressPool] = pydantic_v1.Field(alias="backendAddressPools")
-    frontend_ip_configurations: typing.List[InterfaceIpConfiguration] = pydantic_v1.Field(
-        alias="frontendIPConfigurations"
+    sync_mode: SyncMode = pydantic_v1.Field(alias="syncMode")
+    virtual_network: SubResource = pydantic_v1.Field(alias="virtualNetwork")
+    backend_ip_configurations: typing.Optional[typing.List[InterfaceIpConfiguration]] = pydantic_v1.Field(
+        alias="backendIpConfigurations", default=None
     )
 
     def json(self, **kwargs: typing.Any) -> str:

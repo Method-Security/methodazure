@@ -304,6 +304,7 @@ github.com/std-uritemplate/std-uritemplate/go
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # go.opentelemetry.io/otel v1.24.0
 ## explicit; go 1.20
 go.opentelemetry.io/otel

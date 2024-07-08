@@ -20,10 +20,12 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.5.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/trafficmanager/armtrafficmanager v1.3.0
 	github.com/Method-Security/pkg v0.0.2
+	github.com/google/uuid v1.6.0
 	github.com/microsoftgraph/msgraph-sdk-go v1.45.0
 	github.com/palantir/pkg/datetime v1.1.0
 	github.com/palantir/witchcraft-go-logging v1.51.0
 	github.com/spf13/cobra v1.8.0
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
@@ -35,7 +37,6 @@ require (
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -61,7 +62,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/std-uritemplate/std-uritemplate/go v0.0.55 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
 	go.opentelemetry.io/otel v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect

@@ -5,26 +5,12 @@ import typing
 
 from ...core.datetime_utils import serialize_datetime
 from ...core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
-from ..interface.interface_ip_configuration import InterfaceIpConfiguration
-from .backend_address_pool import BackendAddressPool
-from .load_balancer_sku import LoadBalancerSku
 
 
-class LoadBalancer(pydantic_v1.BaseModel):
-    """
-    LoadBalancer represents an Azure Load Balancer as defined in the Azure Go SDK:
-    https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancer
-    """
-
-    name: str
-    location: str
-    resource_group: str = pydantic_v1.Field(alias="resourceGroup")
-    resource_group_id: str = pydantic_v1.Field(alias="resourceGroupId")
-    sku: LoadBalancerSku
-    backend_address_pools: typing.List[BackendAddressPool] = pydantic_v1.Field(alias="backendAddressPools")
-    frontend_ip_configurations: typing.List[InterfaceIpConfiguration] = pydantic_v1.Field(
-        alias="frontendIPConfigurations"
-    )
+class NatRulePortMapping(pydantic_v1.BaseModel):
+    backend_port: int = pydantic_v1.Field(alias="backendPort")
+    frontend_port: int = pydantic_v1.Field(alias="frontendPort")
+    inbound_nat_rule_name: str = pydantic_v1.Field(alias="inboundNatRuleName")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
