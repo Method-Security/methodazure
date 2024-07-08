@@ -23,10 +23,10 @@ type IPFqdnMapping struct {
 
 // NetworkInterface contains details about a single network interface and its corresponding IP addresses and FQDNs.
 type NetworkInterface struct {
-	ID      	string               	`json:"id" yaml:"id"`
-	Details 	armnetwork.Interface 	`json:"details" yaml:"details"`
-	IPFqdns 	[]IPFqdnMapping      	`json:"ip_fqdn" yaml:"ip_fqdn"`
-	Errors    	[]string       			`json:"errors" yaml:"errors"`
+	ID      string               `json:"id" yaml:"id"`
+	Details armnetwork.Interface `json:"details" yaml:"details"`
+	IPFqdns []IPFqdnMapping      `json:"ip_fqdn" yaml:"ip_fqdn"`
+	Errors  []string             `json:"errors" yaml:"errors"`
 }
 
 // SubnetDetails contains details about a single subnet.
@@ -271,15 +271,15 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 				if err != nil {
 					errors = append(errors, err.Error())
 				}
-				if publicIPResp.Properties != nil  && publicIPResp.Properties.IPAddress != nil{
+				if publicIPResp.Properties != nil && publicIPResp.Properties.IPAddress != nil {
 					ipFqdnMapping := IPFqdnMapping{
-						IP:   *publicIPResp.Properties.IPAddress,
+						IP: *publicIPResp.Properties.IPAddress,
 					}
 					// Some public IPs may not have DNS configured
-					if publicIPResp.Properties.DNSSettings != nil && publicIPResp.Properties.DNSSettings.Fqdn != nil{
+					if publicIPResp.Properties.DNSSettings != nil && publicIPResp.Properties.DNSSettings.Fqdn != nil {
 						ipFqdnMapping.FQDN = *publicIPResp.Properties.DNSSettings.Fqdn
 					}
-					ipFqdnMappings = append(ipFqdnMappings,ipFqdnMapping)
+					ipFqdnMappings = append(ipFqdnMappings, ipFqdnMapping)
 				}
 			}
 		}
