@@ -26,6 +26,7 @@ func main() {
 	methodazure.InitIAMCommand()
 	methodazure.InitTenantCommand()
 	methodazure.InitSubscriptionCommand()
+	methodazure.InitLoadBalancerCommand()
 
 	if err := methodazure.RootCmd.Execute(); err != nil {
 		os.Exit(1)

@@ -83,7 +83,7 @@ func (a *MethodAzure) InitRootCommand() {
 			case "AzureChina":
 				a.AzureConfig.CloudConfig = cloud.AzureChina
 			default:
-				return errors.New("Invalid cloud name provided")
+				return errors.New("invalid cloud name provided")
 			}
 
 			cred, err := azidentity.NewDefaultAzureCredential(nil)

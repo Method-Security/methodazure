@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+types:
+  LoadBalancer:
+    docs: |
+      LoadBalancer represents an Azure Load Balancer as defined in the Azure Go SDK:
+      https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5#LoadBalancer
+    properties:
+      name: string
+      location: string
+      resourceGroup: string
+      resourceGroupId: string
+  LoadBalancerReport:
+    properties:
+      subscriptionId: string
+      tenantId: string
+      loadBalancers: optional<list<LoadBalancer>>
+      errors: optional<list<string>>

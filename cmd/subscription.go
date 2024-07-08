@@ -27,7 +27,7 @@ func (a *MethodAzure) InitSubscriptionCommand() {
 				a.OutputSignal.Status = 1
 				return
 			}
-			if tryAllClouds == true {
+			if tryAllClouds {
 				clouds = []cloud.Configuration{cloud.AzurePublic, cloud.AzureGovernment, cloud.AzureChina}
 			} else {
 				clouds = []cloud.Configuration{a.AzureConfig.CloudConfig}
