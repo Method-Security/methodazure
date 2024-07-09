@@ -3,6 +3,7 @@ package loadbalancer
 import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
 	methodazure "github.com/Method-Security/methodazure/generated/go"
+	
 	"github.com/Method-Security/methodazure/internal/azure"
 	azuretransformers "github.com/Method-Security/methodazure/internal/azure/transformers"
 )

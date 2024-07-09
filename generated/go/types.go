@@ -6,7 +6,260 @@ import (
 	json "encoding/json"
 	fmt "fmt"
 	core "github.com/Method-Security/methodazure/generated/go/core"
+	time "time"
 )
+
+type IamReport struct {
+	SubscriptionId  string            `json:"subscriptionId" url:"subscriptionId"`
+	TenantId        string            `json:"tenantId" url:"tenantId"`
+	RoleAssignments []*RoleAssignment `json:"roleAssignments,omitempty" url:"roleAssignments,omitempty"`
+	RoleDefinitions []*RoleDefinition `json:"roleDefinitions,omitempty" url:"roleDefinitions,omitempty"`
+	Errors          []string          `json:"errors,omitempty" url:"errors,omitempty"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (i *IamReport) GetExtraProperties() map[string]interface{} {
+	return i.extraProperties
+}
+
+func (i *IamReport) UnmarshalJSON(data []byte) error {
+	type unmarshaler IamReport
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*i = IamReport(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *i)
+	if err != nil {
+		return err
+	}
+	i.extraProperties = extraProperties
+
+	i._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (i *IamReport) String() string {
+	if len(i._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(i._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(i); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", i)
+}
+
+type Permission struct {
+	Actions        []string `json:"actions,omitempty" url:"actions,omitempty"`
+	DataActions    []string `json:"dataActions,omitempty" url:"dataActions,omitempty"`
+	NotActions     []string `json:"notActions,omitempty" url:"notActions,omitempty"`
+	NotDataActions []string `json:"notDataActions,omitempty" url:"notDataActions,omitempty"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (p *Permission) GetExtraProperties() map[string]interface{} {
+	return p.extraProperties
+}
+
+func (p *Permission) UnmarshalJSON(data []byte) error {
+	type unmarshaler Permission
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*p = Permission(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *p)
+	if err != nil {
+		return err
+	}
+	p.extraProperties = extraProperties
+
+	p._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (p *Permission) String() string {
+	if len(p._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(p._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(p); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", p)
+}
+
+type PrincipalType string
+
+const (
+	PrincipalTypeDevice           PrincipalType = "Device"
+	PrincipalTypeForeignGroup     PrincipalType = "ForeignGroup"
+	PrincipalTypeGroup            PrincipalType = "Group"
+	PrincipalTypeServicePrincipal PrincipalType = "ServicePrincipal"
+	PrincipalTypeUser             PrincipalType = "User"
+	PrincipalTypeUnknown          PrincipalType = "Unknown"
+)
+
+func NewPrincipalTypeFromString(s string) (PrincipalType, error) {
+	switch s {
+	case "Device":
+		return PrincipalTypeDevice, nil
+	case "ForeignGroup":
+		return PrincipalTypeForeignGroup, nil
+	case "Group":
+		return PrincipalTypeGroup, nil
+	case "ServicePrincipal":
+		return PrincipalTypeServicePrincipal, nil
+	case "User":
+		return PrincipalTypeUser, nil
+	case "Unknown":
+		return PrincipalTypeUnknown, nil
+	}
+	var t PrincipalType
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (p PrincipalType) Ptr() *PrincipalType {
+	return &p
+}
+
+// An Azure Role assignment is a mapping between a user, group, service principal, or managed identity to a role.
+// This type is mirrored after the RoleAssignment type: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2#RoleAssignment
+type RoleAssignment struct {
+	Id                                 string         `json:"id" url:"id"`
+	Name                               string         `json:"name" url:"name"`
+	Type                               string         `json:"type" url:"type"`
+	PrincipalId                        string         `json:"principalId" url:"principalId"`
+	RoleDefinitionId                   string         `json:"roleDefinitionId" url:"roleDefinitionId"`
+	Condition                          *string        `json:"condition,omitempty" url:"condition,omitempty"`
+	ConditionVersion                   *string        `json:"conditionVersion,omitempty" url:"conditionVersion,omitempty"`
+	DelegatedManagedIdentityResourceId *string        `json:"delegatedManagedIdentityResourceId,omitempty" url:"delegatedManagedIdentityResourceId,omitempty"`
+	Description                        *string        `json:"description,omitempty" url:"description,omitempty"`
+	PrincipalType                      *PrincipalType `json:"principalType,omitempty" url:"principalType,omitempty"`
+	CreatedBy                          *string        `json:"createdBy,omitempty" url:"createdBy,omitempty"`
+	CreatedOn                          *time.Time     `json:"createdOn,omitempty" url:"createdOn,omitempty"`
+	Scope                              *string        `json:"scope,omitempty" url:"scope,omitempty"`
+	UpdatedBy                          *string        `json:"updatedBy,omitempty" url:"updatedBy,omitempty"`
+	UpdatedOn                          *time.Time     `json:"updatedOn,omitempty" url:"updatedOn,omitempty"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (r *RoleAssignment) GetExtraProperties() map[string]interface{} {
+	return r.extraProperties
+}
+
+func (r *RoleAssignment) UnmarshalJSON(data []byte) error {
+	type embed RoleAssignment
+	var unmarshaler = struct {
+		embed
+		CreatedOn *core.DateTime `json:"createdOn,omitempty"`
+		UpdatedOn *core.DateTime `json:"updatedOn,omitempty"`
+	}{
+		embed: embed(*r),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*r = RoleAssignment(unmarshaler.embed)
+	r.CreatedOn = unmarshaler.CreatedOn.TimePtr()
+	r.UpdatedOn = unmarshaler.UpdatedOn.TimePtr()
+
+	extraProperties, err := core.ExtractExtraProperties(data, *r)
+	if err != nil {
+		return err
+	}
+	r.extraProperties = extraProperties
+
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RoleAssignment) MarshalJSON() ([]byte, error) {
+	type embed RoleAssignment
+	var marshaler = struct {
+		embed
+		CreatedOn *core.DateTime `json:"createdOn,omitempty"`
+		UpdatedOn *core.DateTime `json:"updatedOn,omitempty"`
+	}{
+		embed:     embed(*r),
+		CreatedOn: core.NewOptionalDateTime(r.CreatedOn),
+		UpdatedOn: core.NewOptionalDateTime(r.UpdatedOn),
+	}
+	return json.Marshal(marshaler)
+}
+
+func (r *RoleAssignment) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+// An Azure Role definition describes certain actions that can be performed on resource(s). This type is mirrored
+// after the RoleDefinition type: https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization/v2#RoleDefinition
+type RoleDefinition struct {
+	Id               string        `json:"id" url:"id"`
+	Name             string        `json:"name" url:"name"`
+	Type             string        `json:"type" url:"type"`
+	AssignableScopes []string      `json:"assignableScopes,omitempty" url:"assignableScopes,omitempty"`
+	Description      *string       `json:"description,omitempty" url:"description,omitempty"`
+	RoleName         *string       `json:"roleName,omitempty" url:"roleName,omitempty"`
+	RoleType         *string       `json:"roleType,omitempty" url:"roleType,omitempty"`
+	Permissions      []*Permission `json:"permissions,omitempty" url:"permissions,omitempty"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (r *RoleDefinition) GetExtraProperties() map[string]interface{} {
+	return r.extraProperties
+}
+
+func (r *RoleDefinition) UnmarshalJSON(data []byte) error {
+	type unmarshaler RoleDefinition
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = RoleDefinition(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *r)
+	if err != nil {
+		return err
+	}
+	r.extraProperties = extraProperties
+
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *RoleDefinition) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
 
 type InterfaceIpConfiguration struct {
 	Id               string           `json:"id" url:"id"`

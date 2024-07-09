@@ -9,6 +9,7 @@ import (
 	armpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5"
+	
 	methodazure "github.com/Method-Security/methodazure/generated/go"
 	"github.com/Method-Security/methodazure/internal/azure"
 	"github.com/Method-Security/methodazure/internal/config"
