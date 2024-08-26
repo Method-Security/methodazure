@@ -2,4 +2,6 @@
 
 import typing
 
-LoadBalancerSkuName = typing.Union[typing.Literal["Basic", "Gateway", "Standard", "Unknown"], typing.Any]
+LoadBalancerSkuName = typing.Union[
+    typing.Literal["Basic", "Gateway", "Standard", "Unknown"], typing.Any
+]

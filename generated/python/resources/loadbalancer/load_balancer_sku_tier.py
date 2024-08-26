@@ -2,4 +2,6 @@
 
 import typing
 
-LoadBalancerSkuTier = typing.Union[typing.Literal["Global", "Regional", "Unknown"], typing.Any]
+LoadBalancerSkuTier = typing.Union[
+    typing.Literal["Global", "Regional", "Unknown"], typing.Any
+]

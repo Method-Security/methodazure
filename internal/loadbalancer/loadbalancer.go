@@ -66,7 +66,7 @@ func EnumerateLoadBalancers(ctx context.Context, cfg config.AzureConfig) methoda
 				errors = append(errors, poolErrors...)
 			}
 			loadBalancer.BackendAddressPools = convertBackendAddressPools(enrichedBackendAddressPools)
-			
+
 			// Frontend IP configurations
 			enrichedFrontendIPConfigs, frontendErrors := enrichFrontendIPConfigurations(ctx, *clientFactory, lb.Properties.FrontendIPConfigurations)
 			if len(frontendErrors) > 0 {
@@ -111,32 +111,34 @@ func enrichBackendAddressPools(ctx context.Context, clientFactory armnetwork.Cli
 					ipConfigDetails, err := azure.GetIPConfurationDetailsFromID(ctx, clientFactory, *backendIPConfig.ID)
 					if err != nil {
 						errors = append(errors, err.Error())
-					} else {
-						if ipConfigDetails != nil {
-							azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex] = ipConfigDetails
+						continue
+					}
 
-							// Attempt to enrich PublicIPAddress with the details
-							if ipConfigDetails.Properties.PublicIPAddress != nil {
-								publicIPDetails, err := azure.GetPublicIPAddressDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.PublicIPAddress.ID)
-								if err != nil {
-									errors = append(errors, err.Error())
-								} else {
-									if publicIPDetails != nil {
-										azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.PublicIPAddress = publicIPDetails
-									}
-								}
+					if ipConfigDetails == nil {
+						continue
+					}
+
+					azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex] = ipConfigDetails
+					// Attempt to enrich PublicIPAddress with the details
+					if ipConfigDetails.Properties.PublicIPAddress != nil {
+						publicIPDetails, err := azure.GetPublicIPAddressDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.PublicIPAddress.ID)
+						if err != nil {
+							errors = append(errors, err.Error())
+						} else {
+							if publicIPDetails != nil {
+								azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.PublicIPAddress = publicIPDetails
 							}
+						}
+					}
 
-							// Attempt to enrich Subnet with the details
-							if ipConfigDetails.Properties.Subnet != nil {
-								subnetDetails, err := azure.GetSubnetDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.Subnet.ID)
-								if err != nil {
-									errors = append(errors, err.Error())
-								} else {
-									if subnetDetails != nil {
-										azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.Subnet = subnetDetails
-									}
-								}
+					// Attempt to enrich Subnet with the details
+					if ipConfigDetails.Properties.Subnet != nil {
+						subnetDetails, err := azure.GetSubnetDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.Subnet.ID)
+						if err != nil {
+							errors = append(errors, err.Error())
+						} else {
+							if subnetDetails != nil {
+								azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.Subnet = subnetDetails
 							}
 						}
 					}

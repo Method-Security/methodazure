@@ -8,12 +8,12 @@ import (
 )
 
 // General helpers
-func convertSubResource(azureSubResource *armnetwork.SubResource) *methodazure.SubResource {
+func convertSubResource(azureSubResource *armnetwork.SubResource) *methodazure.Subresource {
 	if azureSubResource == nil {
 		return nil
 	}
 
-	return &methodazure.SubResource{
+	return &methodazure.Subresource{
 		Id: azure.GetStringPtrValue(azureSubResource.ID),
 	}
 }
@@ -63,7 +63,7 @@ func convertBackendAddressPools(azurePools []*armnetwork.BackendAddressPool) []*
 			BackendIpConfigurations:      azuretransformers.ConvertInterfaceIPConfigurations(azurePool.Properties.BackendIPConfigurations),
 		}
 		syncMode, err := methodazure.NewSyncModeFromString(azure.GetStringEnumPtrValue(azurePool.Properties.SyncMode))
-		if err != nil && syncMode != ""{
+		if err != nil && syncMode != "" {
 			pool.SyncMode = &syncMode
 		}
 		location := azure.GetStringPtrValue(azurePool.Properties.Location)
@@ -161,25 +161,24 @@ func convertLoadBalancingRules(azureRules []*armnetwork.LoadBalancingRule) []*me
 			continue
 		}
 
-		var backendAddressPools []*methodazure.SubResource
+		var backendAddressPools []*methodazure.Subresource
 		for _, pool := range azureRule.Properties.BackendAddressPools {
 			backendAddressPools = append(backendAddressPools, convertSubResource(pool))
 		}
 
 		rule := &methodazure.LoadBalancingRule{
-			Id:                 azure.GetStringPtrValue(azureRule.ID),
-			Name:               azure.GetStringPtrValue(azureRule.Name),
-			FrontendPort:       int(*azureRule.Properties.FrontendPort),
-			BackendAddressPool: convertSubResource(azureRule.Properties.BackendAddressPool),
-			BackendAddressPools: backendAddressPools,
-			BackendPort:        int(*azureRule.Properties.BackendPort),
+			Id:                      azure.GetStringPtrValue(azureRule.ID),
+			Name:                    azure.GetStringPtrValue(azureRule.Name),
+			FrontendPort:            int(*azureRule.Properties.FrontendPort),
+			BackendAddressPool:      convertSubResource(azureRule.Properties.BackendAddressPool),
+			BackendAddressPools:     backendAddressPools,
+			BackendPort:             int(*azureRule.Properties.BackendPort),
 			FrontendIpConfiguration: convertSubResource(azureRule.Properties.FrontendIPConfiguration),
 		}
 		protocol, err := methodazure.NewTransportProtocolFromString(azure.GetStringEnumPtrValue(azureRule.Properties.Protocol))
 		if err != nil && protocol != "" {
 			rule.Protocol = protocol
 		}
-		
 
 		rules = append(rules, rule)
 	}
