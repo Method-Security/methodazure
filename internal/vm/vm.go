@@ -23,16 +23,18 @@ type IPFqdnMapping struct {
 
 // NetworkInterface contains details about a single network interface and its corresponding IP addresses and FQDNs.
 type NetworkInterface struct {
-	ID      string               `json:"id" yaml:"id"`
-	Details armnetwork.Interface `json:"details" yaml:"details"`
-	IPFqdns []IPFqdnMapping      `json:"ip_fqdn" yaml:"ip_fqdn"`
-	Errors  []string             `json:"errors" yaml:"errors"`
+	ID                     string               `json:"id" yaml:"id"`
+	Details                armnetwork.Interface `json:"details" yaml:"details"`
+	IPFqdns                []IPFqdnMapping      `json:"ip_fqdn" yaml:"ip_fqdn"`
+	NetworkSecurityGroupID *string              `json:"network_security_group_id" yaml:"network_security_group_id"`
+	Errors                 []string             `json:"errors" yaml:"errors"`
 }
 
 // SubnetDetails contains details about a single subnet.
 type SubnetDetails struct {
-	ID            string `json:"id" yaml:"id"`
-	AddressPrefix string `json:"address_prefix" yaml:"address_prefix"`
+	ID                     string  `json:"id" yaml:"id"`
+	AddressPrefix          string  `json:"address_prefix" yaml:"address_prefix"`
+	NetworkSecurityGroupID *string `json:"network_security_group_id" yaml:"network_security_group_id"`
 }
 
 // VirtualMachine contains details about a single Virtual Machine and its corresponding network interfaces and linked subnets.
@@ -81,7 +83,7 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 	}
 
 	vnetLookup := make(map[string]string)
-	subnetLookup := make(map[string]string)
+	subnetLookup := make(map[string]SubnetDetails)
 	for _, v := range vnetReport.Resources.VirtualNetworks {
 		if v.Details.ID == nil {
 			continue
@@ -94,7 +96,17 @@ func EnumerateVMs(ctx context.Context, cfg config.AzureConfig) (*AzureResourceRe
 			if s.ID != nil && s.Properties != nil && s.Properties.AddressPrefix != nil {
 				continue
 			}
-			subnetLookup[*s.ID] = *s.Properties.AddressPrefix
+
+			var nsgID *string = nil
+			if s.Properties.NetworkSecurityGroup != nil {
+				nsgID = s.Properties.NetworkSecurityGroup.ID
+			}
+
+			subnetLookup[*s.ID] = SubnetDetails{
+				ID:                     *s.ID,
+				AddressPrefix:          *s.Properties.AddressPrefix,
+				NetworkSecurityGroupID: nsgID,
+			}
 		}
 	}
 
@@ -227,6 +239,7 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 	for idx, nic := range networkProfile.NetworkInterfaces {
 		nicID := *nic.ID
 		var nicInterface armnetwork.Interface
+		var nsgID *string = nil
 		errors := []string{}
 
 		switch vmType {
@@ -238,6 +251,9 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 				return "", nil, err
 			}
 			nicInterface = nicResp.Interface
+			if nicInterface.Properties.NetworkSecurityGroup != nil {
+				nsgID = nicInterface.Properties.NetworkSecurityGroup.ID
+			}
 		case "vmssvm":
 			nicIDParts := strings.Split(nicID, "/")
 			if len(nicIDParts) < 9 {
@@ -253,12 +269,16 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 				return "", nil, err
 			}
 			nicInterface = nicResp.Interface
+			if nicInterface.Properties.NetworkSecurityGroup != nil {
+				nsgID = nicInterface.Properties.NetworkSecurityGroup.ID
+			}
 		}
 
 		// Populate networkInterface object
 		networkInterface := NetworkInterface{
-			ID:      nicID,
-			Details: nicInterface,
+			ID:                     nicID,
+			Details:                nicInterface,
+			NetworkSecurityGroupID: nsgID,
 		}
 
 		// Get IP FQDN mappings if available
@@ -306,7 +326,7 @@ func getVNetIDAndNetworkInterfaces(ctx context.Context, cfg config.AzureConfig, 
 }
 
 // Helper function to get SubnetDetails from network interfaces
-func getSubnetDetails(networkInterfaces []NetworkInterface, subnetLookup map[string]string) []SubnetDetails {
+func getSubnetDetails(networkInterfaces []NetworkInterface, subnetLookup map[string]SubnetDetails) []SubnetDetails {
 	subnetDetails := []SubnetDetails{}
 	subnetSet := make(map[string]bool)
 
@@ -317,11 +337,8 @@ func getSubnetDetails(networkInterfaces []NetworkInterface, subnetLookup map[str
 					subnetID := *ipConfig.Properties.Subnet.ID
 					if _, exists := subnetSet[subnetID]; !exists {
 						subnetSet[subnetID] = true
-						if addressPrefix, ok := subnetLookup[subnetID]; ok {
-							subnetDetails = append(subnetDetails, SubnetDetails{
-								ID:            subnetID,
-								AddressPrefix: addressPrefix,
-							})
+						if details, ok := subnetLookup[subnetID]; ok {
+							subnetDetails = append(subnetDetails, details)
 						}
 					}
 				}

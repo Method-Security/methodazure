@@ -8,6 +8,89 @@ import (
 	core "github.com/Method-Security/methodazure/generated/go/core"
 )
 
+type ResourceGroup struct {
+	Id   string `json:"id" url:"id"`
+	Name string `json:"name" url:"name"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (r *ResourceGroup) GetExtraProperties() map[string]interface{} {
+	return r.extraProperties
+}
+
+func (r *ResourceGroup) UnmarshalJSON(data []byte) error {
+	type unmarshaler ResourceGroup
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*r = ResourceGroup(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *r)
+	if err != nil {
+		return err
+	}
+	r.extraProperties = extraProperties
+
+	r._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (r *ResourceGroup) String() string {
+	if len(r._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(r._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(r); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", r)
+}
+
+type Subresource struct {
+	Id string `json:"id" url:"id"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (s *Subresource) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *Subresource) UnmarshalJSON(data []byte) error {
+	type unmarshaler Subresource
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*s = Subresource(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *s)
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+
+	s._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *Subresource) String() string {
+	if len(s._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
 type InterfaceIpConfiguration struct {
 	Id               string           `json:"id" url:"id"`
 	Name             string           `json:"name" url:"name"`
@@ -52,6 +135,50 @@ func (i *InterfaceIpConfiguration) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", i)
+}
+
+type NetworkInterface struct {
+	Id                     string  `json:"id" url:"id"`
+	Name                   string  `json:"name" url:"name"`
+	NetworkSecurityGroupId *string `json:"networkSecurityGroupID,omitempty" url:"networkSecurityGroupID,omitempty"`
+	MacAddress             *string `json:"macAddress,omitempty" url:"macAddress,omitempty"`
+
+	extraProperties map[string]interface{}
+	_rawJSON        json.RawMessage
+}
+
+func (n *NetworkInterface) GetExtraProperties() map[string]interface{} {
+	return n.extraProperties
+}
+
+func (n *NetworkInterface) UnmarshalJSON(data []byte) error {
+	type unmarshaler NetworkInterface
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*n = NetworkInterface(value)
+
+	extraProperties, err := core.ExtractExtraProperties(data, *n)
+	if err != nil {
+		return err
+	}
+	n.extraProperties = extraProperties
+
+	n._rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (n *NetworkInterface) String() string {
+	if len(n._rawJSON) > 0 {
+		if value, err := core.StringifyJSON(n._rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := core.StringifyJSON(n); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", n)
 }
 
 type PublicIpAddressDnsSettings struct {
@@ -142,11 +269,12 @@ func (p *PublicIpAddress) String() string {
 }
 
 type Subnet struct {
-	Id              string   `json:"id" url:"id"`
-	Name            string   `json:"name" url:"name"`
-	Type            *string  `json:"type,omitempty" url:"type,omitempty"`
-	AddressPrefix   *string  `json:"addressPrefix,omitempty" url:"addressPrefix,omitempty"`
-	AddressPrefixes []string `json:"addressPrefixes,omitempty" url:"addressPrefixes,omitempty"`
+	Id                     string   `json:"id" url:"id"`
+	Name                   string   `json:"name" url:"name"`
+	Type                   *string  `json:"type,omitempty" url:"type,omitempty"`
+	AddressPrefix          *string  `json:"addressPrefix,omitempty" url:"addressPrefix,omitempty"`
+	AddressPrefixes        []string `json:"addressPrefixes,omitempty" url:"addressPrefixes,omitempty"`
+	NetworkSecurityGroupId *string  `json:"networkSecurityGroupID,omitempty" url:"networkSecurityGroupID,omitempty"`
 
 	extraProperties map[string]interface{}
 	_rawJSON        json.RawMessage
@@ -220,7 +348,7 @@ type BackendAddressPool struct {
 	LoadBalancerBackendAddresses []*LoadBalancerBackendAddress `json:"loadBalancerBackendAddresses,omitempty" url:"loadBalancerBackendAddresses,omitempty"`
 	Location                     *string                       `json:"location,omitempty" url:"location,omitempty"`
 	SyncMode                     *SyncMode                     `json:"syncMode,omitempty" url:"syncMode,omitempty"`
-	VirtualNetwork               *SubResource                  `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
+	VirtualNetwork               *Subresource                  `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
 	BackendIpConfigurations      []*InterfaceIpConfiguration   `json:"backendIpConfigurations,omitempty" url:"backendIpConfigurations,omitempty"`
 
 	extraProperties map[string]interface{}
@@ -316,11 +444,12 @@ type LoadBalancerBackendAddress struct {
 	Name                                string                                `json:"name" url:"name"`
 	AdminState                          *LoadBalancerBackendAddressAdminState `json:"adminState,omitempty" url:"adminState,omitempty"`
 	IpAddress                           *string                               `json:"ipAddress,omitempty" url:"ipAddress,omitempty"`
-	LoadBalancerFrontendIpConfiguration *SubResource                          `json:"loadBalancerFrontendIPConfiguration,omitempty" url:"loadBalancerFrontendIPConfiguration,omitempty"`
-	Subnet                              *SubResource                          `json:"subnet,omitempty" url:"subnet,omitempty"`
-	VirtualNetwork                      *SubResource                          `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
+	LoadBalancerFrontendIpConfiguration *Subresource                          `json:"loadBalancerFrontendIPConfiguration,omitempty" url:"loadBalancerFrontendIPConfiguration,omitempty"`
+	Subnet                              *Subresource                          `json:"subnet,omitempty" url:"subnet,omitempty"`
+	VirtualNetwork                      *Subresource                          `json:"virtualNetwork,omitempty" url:"virtualNetwork,omitempty"`
 	InboundNatRulesPortMapping          []*NatRulePortMapping                 `json:"inboundNatRulesPortMapping,omitempty" url:"inboundNatRulesPortMapping,omitempty"`
-	NetworkInterfaceIpConfigurations    *SubResource                          `json:"NetworkInterfaceIpConfigurations,omitempty" url:"NetworkInterfaceIpConfigurations,omitempty"`
+	NetworkInterfaceIpConfigurations    *Subresource                          `json:"networkInterfaceIpConfigurations,omitempty" url:"networkInterfaceIpConfigurations,omitempty"`
+	NetworkInterface                    *NetworkInterface                     `json:"networkInterface,omitempty" url:"networkInterface,omitempty"`
 
 	extraProperties map[string]interface{}
 	_rawJSON        json.RawMessage
@@ -531,10 +660,10 @@ type LoadBalancingRule struct {
 	Name                    string            `json:"name" url:"name"`
 	FrontendPort            int               `json:"frontendPort" url:"frontendPort"`
 	Protocol                TransportProtocol `json:"protocol" url:"protocol"`
-	BackendAddressPool      *SubResource      `json:"backendAddressPool,omitempty" url:"backendAddressPool,omitempty"`
-	BackendAddressPools     []*SubResource    `json:"backendAddressPools,omitempty" url:"backendAddressPools,omitempty"`
+	BackendAddressPool      *Subresource      `json:"backendAddressPool,omitempty" url:"backendAddressPool,omitempty"`
+	BackendAddressPools     []*Subresource    `json:"backendAddressPools,omitempty" url:"backendAddressPools,omitempty"`
 	BackendPort             int               `json:"backendPort" url:"backendPort"`
-	FrontendIpConfiguration *SubResource      `json:"frontendIPConfiguration,omitempty" url:"frontendIPConfiguration,omitempty"`
+	FrontendIpConfiguration *Subresource      `json:"frontendIPConfiguration,omitempty" url:"frontendIPConfiguration,omitempty"`
 
 	extraProperties map[string]interface{}
 	_rawJSON        json.RawMessage
@@ -615,47 +744,6 @@ func (n *NatRulePortMapping) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", n)
-}
-
-type SubResource struct {
-	Id string `json:"id" url:"id"`
-
-	extraProperties map[string]interface{}
-	_rawJSON        json.RawMessage
-}
-
-func (s *SubResource) GetExtraProperties() map[string]interface{} {
-	return s.extraProperties
-}
-
-func (s *SubResource) UnmarshalJSON(data []byte) error {
-	type unmarshaler SubResource
-	var value unmarshaler
-	if err := json.Unmarshal(data, &value); err != nil {
-		return err
-	}
-	*s = SubResource(value)
-
-	extraProperties, err := core.ExtractExtraProperties(data, *s)
-	if err != nil {
-		return err
-	}
-	s.extraProperties = extraProperties
-
-	s._rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (s *SubResource) String() string {
-	if len(s._rawJSON) > 0 {
-		if value, err := core.StringifyJSON(s._rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := core.StringifyJSON(s); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", s)
 }
 
 type SyncMode string

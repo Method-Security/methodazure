@@ -16,12 +16,18 @@ func ConvertSubnet(azureSubnet *armnetwork.Subnet) *methodazure.Subnet {
 		addressPrefixes = append(addressPrefixes, *prefix)
 	}
 
+	var nsgID *string = nil
+	if azureSubnet.Properties.NetworkSecurityGroup != nil {
+		nsgID = azureSubnet.Properties.NetworkSecurityGroup.ID
+	}
+
 	subnet := &methodazure.Subnet{
-		Id:              azure.GetStringPtrValue(azureSubnet.ID),
-		Name:            azure.GetStringPtrValue(azureSubnet.Name),
-		Type:			 azureSubnet.Type,
-		AddressPrefix:   azureSubnet.Properties.AddressPrefix,
-		AddressPrefixes: addressPrefixes,
+		Id:                     azure.GetStringPtrValue(azureSubnet.ID),
+		Name:                   azure.GetStringPtrValue(azureSubnet.Name),
+		Type:                   azureSubnet.Type,
+		AddressPrefix:          azureSubnet.Properties.AddressPrefix,
+		AddressPrefixes:        addressPrefixes,
+		NetworkSecurityGroupId: nsgID,
 	}
 
 	return subnet
@@ -81,4 +87,22 @@ func ConvertTransportProtocol(azureProtocol *armnetwork.TransportProtocol) metho
 	}
 
 	return methodazure.TransportProtocol(*azureProtocol)
+}
+
+func ConvertNetworkInterface(networkInterface *armnetwork.Interface) *methodazure.NetworkInterface {
+	if networkInterface == nil {
+		return nil
+	}
+
+	var nsgID *string = nil
+	if networkInterface.Properties.NetworkSecurityGroup != nil {
+		nsgID = networkInterface.Properties.NetworkSecurityGroup.ID
+	}
+
+	return &methodazure.NetworkInterface{
+		Id:                     azure.GetStringPtrValue(networkInterface.ID),
+		Name:                   azure.GetStringPtrValue(networkInterface.Name),
+		NetworkSecurityGroupId: nsgID,
+		MacAddress:             networkInterface.Properties.MacAddress,
+	}
 }

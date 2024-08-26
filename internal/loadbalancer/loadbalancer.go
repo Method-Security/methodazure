@@ -65,8 +65,12 @@ func EnumerateLoadBalancers(ctx context.Context, cfg config.AzureConfig) methoda
 			if len(poolErrors) > 0 {
 				errors = append(errors, poolErrors...)
 			}
-			loadBalancer.BackendAddressPools = convertBackendAddressPools(enrichedBackendAddressPools)
-			
+			networkInterfaceDetails, nicErrors := getNetworkInterfaceDetailsForBackendAddressPools(ctx, *clientFactory, enrichedBackendAddressPools)
+			if len(nicErrors) > 0 {
+				errors = append(errors, nicErrors...)
+			}
+			loadBalancer.BackendAddressPools = convertBackendAddressPools(enrichedBackendAddressPools, networkInterfaceDetails)
+
 			// Frontend IP configurations
 			enrichedFrontendIPConfigs, frontendErrors := enrichFrontendIPConfigurations(ctx, *clientFactory, lb.Properties.FrontendIPConfigurations)
 			if len(frontendErrors) > 0 {
@@ -111,32 +115,34 @@ func enrichBackendAddressPools(ctx context.Context, clientFactory armnetwork.Cli
 					ipConfigDetails, err := azure.GetIPConfurationDetailsFromID(ctx, clientFactory, *backendIPConfig.ID)
 					if err != nil {
 						errors = append(errors, err.Error())
-					} else {
-						if ipConfigDetails != nil {
-							azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex] = ipConfigDetails
+						continue
+					}
 
-							// Attempt to enrich PublicIPAddress with the details
-							if ipConfigDetails.Properties.PublicIPAddress != nil {
-								publicIPDetails, err := azure.GetPublicIPAddressDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.PublicIPAddress.ID)
-								if err != nil {
-									errors = append(errors, err.Error())
-								} else {
-									if publicIPDetails != nil {
-										azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.PublicIPAddress = publicIPDetails
-									}
-								}
+					if ipConfigDetails == nil {
+						continue
+					}
+
+					azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex] = ipConfigDetails
+					// Attempt to enrich PublicIPAddress with the details
+					if ipConfigDetails.Properties.PublicIPAddress != nil {
+						publicIPDetails, err := azure.GetPublicIPAddressDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.PublicIPAddress.ID)
+						if err != nil {
+							errors = append(errors, err.Error())
+						} else {
+							if publicIPDetails != nil {
+								azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.PublicIPAddress = publicIPDetails
 							}
+						}
+					}
 
-							// Attempt to enrich Subnet with the details
-							if ipConfigDetails.Properties.Subnet != nil {
-								subnetDetails, err := azure.GetSubnetDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.Subnet.ID)
-								if err != nil {
-									errors = append(errors, err.Error())
-								} else {
-									if subnetDetails != nil {
-										azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.Subnet = subnetDetails
-									}
-								}
+					// Attempt to enrich Subnet with the details
+					if ipConfigDetails.Properties.Subnet != nil {
+						subnetDetails, err := azure.GetSubnetDetailsFromID(ctx, clientFactory, *ipConfigDetails.Properties.Subnet.ID)
+						if err != nil {
+							errors = append(errors, err.Error())
+						} else {
+							if subnetDetails != nil {
+								azurePools[azurePoolIndex].Properties.BackendIPConfigurations[backendIPConfigIndex].Properties.Subnet = subnetDetails
 							}
 						}
 					}
@@ -226,4 +232,43 @@ func getLoadBalancerNameFromID(id string) string {
 		}
 	}
 	return ""
+}
+
+func getNetworkInterfaceDetailsFromID(ctx context.Context, clientFactory armnetwork.ClientFactory, id string) (*armnetwork.Interface, error) {
+	// Create a Network Interface client
+	client := clientFactory.NewInterfacesClient()
+
+	resourceGroup := azure.GetResourceGroupFromID(id)
+	networkInterfaceName := azure.GetResourceNameFromID(id)
+	// Get the network interface details
+	resp, err := client.Get(ctx, resourceGroup, networkInterfaceName, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get network interface details: %v", err)
+	}
+
+	return &resp.Interface, nil
+}
+
+func getNetworkInterfaceDetailsForBackendAddressPools(ctx context.Context, clientFactory armnetwork.ClientFactory, azurePools []*armnetwork.BackendAddressPool) (map[string]*armnetwork.Interface, []string) {
+	networkInterfaceDetails := make(map[string]*armnetwork.Interface)
+	errors := []string{}
+
+	for _, azurePool := range azurePools {
+		if azurePool == nil {
+			continue
+		}
+
+		for _, backendIPConfig := range azurePool.Properties.BackendIPConfigurations {
+			if backendIPConfig.ID != nil {
+				nic, err := getNetworkInterfaceDetailsFromID(ctx, clientFactory, *backendIPConfig.ID)
+				if err != nil {
+					errors = append(errors, err.Error())
+				} else {
+					networkInterfaceDetails[*backendIPConfig.ID] = nic
+				}
+			}
+		}
+	}
+
+	return networkInterfaceDetails, errors
 }

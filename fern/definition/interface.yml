@@ -13,6 +13,7 @@ types:
       type: optional<string>
       addressPrefix: optional<string>
       addressPrefixes: optional<list<string>>
+      networkSecurityGroupID: optional<string>
   PublicIPAddressDNSSettings:
     properties:
       domainNameLabel: string
@@ -32,3 +33,9 @@ types:
       privateIpAddress: optional<string>
       publicIpAddress: optional<PublicIpAddress>
       subnet: optional<Subnet>
+  NetworkInterface:
+    properties:
+      id: string
+      name: string
+      networkSecurityGroupID: optional<string>
+      macAddress: optional<string>

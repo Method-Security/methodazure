@@ -2,4 +2,6 @@
 
 import typing
 
-LoadBalancerBackendAddressAdminState = typing.Union[typing.Literal["Down", "None", "Up"], typing.Any]
+LoadBalancerBackendAddressAdminState = typing.Union[
+    typing.Literal["Down", "None", "Up"], typing.Any
+]
