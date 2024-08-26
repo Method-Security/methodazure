@@ -45,7 +45,7 @@ func convertLoadBalancerSkuType(sku *armnetwork.LoadBalancerSKU) *methodazure.Lo
 }
 
 // BackendAddressPool transformers
-func convertBackendAddressPools(azurePools []*armnetwork.BackendAddressPool, networkInterfacesByID map[string]*armnetwork.Interface) []*methodazure.BackendAddressPool {
+func convertBackendAddressPools(azurePools []*armnetwork.BackendAddressPool) []*methodazure.BackendAddressPool {
 	var pools []*methodazure.BackendAddressPool
 
 	for _, azurePool := range azurePools {
@@ -59,7 +59,7 @@ func convertBackendAddressPools(azurePools []*armnetwork.BackendAddressPool, net
 			Id:                           azure.GetStringPtrValue(azurePool.ID),
 			Name:                         azure.GetStringPtrValue(azurePool.Name),
 			Type:                         azure.GetStringPtrValue(azurePool.Type),
-			LoadBalancerBackendAddresses: convertBackendAddresses(azurePool.Properties.LoadBalancerBackendAddresses, networkInterfacesByID),
+			LoadBalancerBackendAddresses: convertBackendAddresses(azurePool.Properties.LoadBalancerBackendAddresses),
 			BackendIpConfigurations:      azuretransformers.ConvertInterfaceIPConfigurations(azurePool.Properties.BackendIPConfigurations),
 		}
 		syncMode, err := methodazure.NewSyncModeFromString(azure.GetStringEnumPtrValue(azurePool.Properties.SyncMode))
@@ -77,7 +77,7 @@ func convertBackendAddressPools(azurePools []*armnetwork.BackendAddressPool, net
 	return pools
 }
 
-func convertBackendAddresses(azureAddresses []*armnetwork.LoadBalancerBackendAddress, networkInterfacesByID map[string]*armnetwork.Interface) []*methodazure.LoadBalancerBackendAddress {
+func convertBackendAddresses(azureAddresses []*armnetwork.LoadBalancerBackendAddress) []*methodazure.LoadBalancerBackendAddress {
 	var addresses []*methodazure.LoadBalancerBackendAddress
 
 	for _, azureAddress := range azureAddresses {
@@ -101,13 +101,6 @@ func convertBackendAddresses(azureAddresses []*armnetwork.LoadBalancerBackendAdd
 		ipAddress := azure.GetStringPtrValue(azureAddress.Properties.IPAddress)
 		if ipAddress != "" {
 			address.IpAddress = &ipAddress
-		}
-
-		// Enrich the address with the network interface if possible
-		if azureAddress.Properties.NetworkInterfaceIPConfiguration != nil && azureAddress.Properties.NetworkInterfaceIPConfiguration.ID != nil {
-			if networkInterface, ok := networkInterfacesByID[*azureAddress.Properties.NetworkInterfaceIPConfiguration.ID]; ok {
-				address.NetworkInterface = azuretransformers.ConvertNetworkInterface(networkInterface)
-			}
 		}
 
 		addresses = append(addresses, address)
