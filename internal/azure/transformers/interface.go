@@ -63,7 +63,7 @@ func ConvertInterfaceIPConfigurations(azureIPConfigs []*armnetwork.InterfaceIPCo
 	var ipConfigs []*methodazure.InterfaceIpConfiguration
 
 	for _, azureIPConfig := range azureIPConfigs {
-		if azureIPConfig == nil {
+		if azureIPConfig == nil || azureIPConfig.Properties == nil {
 			continue
 		}
 
