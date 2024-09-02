@@ -90,5 +90,5 @@ types:
     properties:
       subscriptionId: string
       tenantId: string
-      loadBalancers: list<LoadBalancer>
+      loadBalancers: optional<list<LoadBalancer>>
       errors: optional<list<string>>
