@@ -10,7 +10,9 @@ from ...core.pydantic_utilities import IS_PYDANTIC_V2
 class LoadBalancerReport(UniversalBaseModel):
     subscription_id: str = pydantic.Field(alias="subscriptionId")
     tenant_id: str = pydantic.Field(alias="tenantId")
-    load_balancers: typing.List[LoadBalancer] = pydantic.Field(alias="loadBalancers")
+    load_balancers: typing.Optional[typing.List[LoadBalancer]] = pydantic.Field(
+        alias="loadBalancers", default=None
+    )
     errors: typing.Optional[typing.List[str]] = None
 
     if IS_PYDANTIC_V2:
