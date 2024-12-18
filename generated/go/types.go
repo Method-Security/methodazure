@@ -5,6 +5,7 @@ package methodazure
 import (
 	json "encoding/json"
 	fmt "fmt"
+
 	core "github.com/Method-Security/methodazure/generated/go/core"
 )
 
