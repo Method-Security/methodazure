@@ -19,11 +19,11 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql v1.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.5.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/trafficmanager/armtrafficmanager v1.3.0
-	github.com/Method-Security/pkg v0.0.2
+	github.com/Method-Security/pkg v0.0.3
 	github.com/google/uuid v1.6.0
 	github.com/microsoftgraph/msgraph-sdk-go v1.45.0
 	github.com/palantir/pkg/datetime v1.1.0
-	github.com/palantir/witchcraft-go-logging v1.51.0
+	github.com/palantir/witchcraft-go-logging v1.57.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
 )
@@ -55,9 +55,9 @@ require (
 	github.com/palantir/pkg/safelong v1.1.0 // indirect
 	github.com/palantir/pkg/safeyaml v1.1.0 // indirect
 	github.com/palantir/pkg/transform v1.1.0 // indirect
-	github.com/palantir/witchcraft-go-error v1.34.0 // indirect
-	github.com/palantir/witchcraft-go-params v1.31.0 // indirect
-	github.com/palantir/witchcraft-go-tracing v1.33.0 // indirect
+	github.com/palantir/witchcraft-go-error v1.38.0 // indirect
+	github.com/palantir/witchcraft-go-params v1.35.0 // indirect
+	github.com/palantir/witchcraft-go-tracing v1.37.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
